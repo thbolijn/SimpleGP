@@ -3,6 +3,7 @@ import numpy as np
 import sklearn.datasets
 from sklearn.model_selection import train_test_split
 from copy import deepcopy
+import pandas as pd
 
 # Internal imports
 from simplegp.Nodes.BaseNode import Node
@@ -12,16 +13,35 @@ from simplegp.Evolution.Evolution import SimpleGP
 
 np.random.seed(42)
 
-# Load regression dataset 
-X, y = sklearn.datasets.load_boston( return_X_y=True )
+# Choose the dataset from here
+yacht = 'datasets/yacht_full.dat'
+white_wine = 'datasets/winewhite_full.dat'
+red_wine = 'datasets/winered_full.dat'
+airfoil = 'datasets/airfoil_full.dat'
+boston = 'datasets/bostonhousing_full.dat'
+concrete = 'datasets/concrete_full.dat'
+downchemical = 'datasets/downchemical_full.dat'
+cooling = 'datasets/energycooling_full.dat'
+heating = 'datasets/energyheating_full.dat'
+tower = 'datasets/tower_full.dat'
+
+# Load regression dataset
+df = pd.read_csv(tower, header=None, delimiter=' ')		# Replace the corresponding string for a certain data-set
+
+X = df.iloc[:, :-1]
+y = df.iloc[:, -1]
+
+X = X.values
+y = y.values
+
 # Take a dataset split
 X_train, X_test, y_train, y_test = train_test_split( X, y, test_size=0.5, random_state=42 )
 # Set fitness function
 fitness_function = SymbolicRegressionFitness( X_train, y_train )
 
 # Set functions and terminals
-functions = [ AddNode(with_weights=True), SubNode(with_weights=True), MulNode(with_weights=True), AnalyticQuotientNode(with_weights=True) ]	# chosen function nodes
-terminals = [ EphemeralRandomConstantNode(with_weights=True) ]	# use one ephemeral random constant node
+functions = [ AddNode(with_weights=False), SubNode(with_weights=False), MulNode(with_weights=False), AnalyticQuotientNode(with_weights=False) ]	# chosen function nodes
+terminals = [ EphemeralRandomConstantNode(with_weights=False) ]	# use one ephemeral random constant node
 for i in range(X.shape[1]):
 	terminals.append(FeatureNode(i))	# add a feature node for each feature
 
