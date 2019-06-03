@@ -92,6 +92,19 @@ class SimpleGP:
 			PO = population+O
 			population = Selection.TournamentSelect( PO, len(population), tournament_size=self.tournament_size )
 
+			# Here the weights tuning should happen
+
+			for p in population:
+				nodes = p.GetSubtree()
+				W = []		# weight vector
+				for n in nodes:
+					W.append(n.weights)
+					print('\n Weights: ', n.weights)
+				# Here the actual tuning should happen W -> EA -> better W
+				for n in nodes:
+					n.weights = W.pop()
+
+
 			self.generations = self.generations + 1
 
-			print ('g:',self.generations,'elite fitness:', np.round(self.fitness_function.elite.fitness,3), ', size:', len(self.fitness_function.elite.GetSubtree()))
+			print('g:', self.generations, 'elite fitness:', np.round(self.fitness_function.elite.fitness, 3), ', size:', len(self.fitness_function.elite.GetSubtree()))

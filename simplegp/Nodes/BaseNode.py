@@ -1,7 +1,8 @@
 import numpy as np
 import random as rnd
 
-class Node:	# Base class with general functionalities
+
+class Node:		# Base class with general functionalities
 
 	def __init__(self, with_weights=False):
 		self.fitness = np.inf
@@ -17,7 +18,7 @@ class Node:	# Base class with general functionalities
 			self.weights.append(1)
 			self.weights.append(0)
 
-	def GetSubtree( self ):
+	def GetSubtree(self):
 		result = []
 		self.__GetSubtreeRecursive(result)
 		return result

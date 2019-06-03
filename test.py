@@ -40,8 +40,8 @@ X_train, X_test, y_train, y_test = train_test_split( X, y, test_size=0.5, random
 fitness_function = SymbolicRegressionFitness( X_train, y_train )
 
 # Set functions and terminals
-functions = [ AddNode(with_weights=False), SubNode(with_weights=False), MulNode(with_weights=False), AnalyticQuotientNode(with_weights=False) ]	# chosen function nodes
-terminals = [ EphemeralRandomConstantNode(with_weights=False) ]	# use one ephemeral random constant node
+functions = [AddNode(with_weights=True), SubNode(with_weights=True), MulNode(with_weights=True), AnalyticQuotientNode(with_weights=True)]	# chosen function nodes
+terminals = [EphemeralRandomConstantNode(with_weights=True)]	# use one ephemeral random constant node
 for i in range(X.shape[1]):
 	terminals.append(FeatureNode(i))	# add a feature node for each feature
 
