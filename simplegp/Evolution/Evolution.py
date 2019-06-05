@@ -5,6 +5,7 @@ from copy import deepcopy
 
 from simplegp.Variation import Variation
 from simplegp.Selection import Selection
+from PSO import PSO
 
 
 class SimpleGP:
@@ -22,7 +23,8 @@ class SimpleGP:
 		max_time=-1,
 		initialization_max_tree_height=4,
 		max_tree_size=100,
-		tournament_size=4
+		tournament_size=4,
+		genetic_algorithm="PSO"
 		):
 
 		self.pop_size = pop_size
@@ -39,6 +41,8 @@ class SimpleGP:
 		self.initialization_max_tree_height = initialization_max_tree_height
 		self.max_tree_size = max_tree_size
 		self.tournament_size = tournament_size
+
+		self.genetic_algorithm = genetic_algorithm
 
 		self.generations = 0
 
@@ -90,19 +94,27 @@ class SimpleGP:
 				O.append(o)
 
 			PO = population+O
-			population = Selection.TournamentSelect( PO, len(population), tournament_size=self.tournament_size )
+			population = Selection.TournamentSelect(PO, len(population), tournament_size=self.tournament_size )
 
 			# Here the weights tuning should happen
 
 			for p in population:
+				if self.genetic_algorithm == "PSO":
+					costfunc = 0  # TODO: pass the function of the tree to evaluate the fitness
+					nodes = p.GetSubtree()
+					W = []  # weight vector
+					for n in nodes:
+						W.append(n.weights)
+						print('\n Weights: ', n.weights)
+					bounds = [(-10, 10)] * len(W) * 2
+					num_particles = 20
+					max_iterations = 30
+					pso = PSO(self.fitness_function.Evaluate, W, bounds, p, num_particles, max_iterations)
+					W = pso.solution()
+
 				nodes = p.GetSubtree()
-				W = []		# weight vector
 				for n in nodes:
-					W.append(n.weights)
-					print('\n Weights: ', n.weights)
-				# Here the actual tuning should happen W -> EA -> better W
-				for n in nodes:
-					n.weights = W.pop()
+					n.weights = [W.pop(), W.pop()]
 
 
 			self.generations = self.generations + 1
