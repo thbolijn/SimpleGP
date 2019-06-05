@@ -91,7 +91,7 @@ class PSO():
         # Here the actual tuning should happen W -> EA -> better W
 
         x0 = [item for sublist in W for item in sublist]
-        x0 = [random.uniform(-100, 100) for i in range(len(x0))]
+        # x0 = [random.uniform(-100, 100) for i in range(len(x0))]
 
         global num_dimensions
 
