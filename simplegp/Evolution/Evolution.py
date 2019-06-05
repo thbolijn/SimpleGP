@@ -119,15 +119,18 @@ class SimpleGP:
                             for n in nodes:
                                 W.append(n.weights)
                             # print('\n Weights: ', n.weights)
-                            bounds = [(-100, 100)] * len(W) * 2
+                            bounds = [(-25, 25)] * len(W) * 2
                             num_particles = 40
                             max_iterations = 100
                             pso = PSO(self.fitness_function.Evaluate, W, bounds, p, num_particles, max_iterations)
                             W = pso.solution()
 
+                        self.show_weight_histogram(W, bounds[0])
+
                         nodes = p.GetSubtree()
                         for n in nodes:
                             n.weights = [W.pop(), W.pop()]
+
 
             self.generations = self.generations + 1
 
@@ -138,6 +141,10 @@ class SimpleGP:
         treesizes = []
         for p in population:
             treesizes.append(len(p.GetSubtree()))
-        print(treesizes)
+        # print(treesizes)
         plt.hist(treesizes, bins=range(1, self.max_tree_size))
+        plt.show()
+
+    def show_weight_histogram(self, weights, bounds):
+        plt.hist(weights, range=bounds, bins=range(bounds[0], bounds[1], 2))
         plt.show()

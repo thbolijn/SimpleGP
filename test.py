@@ -10,8 +10,10 @@ from simplegp.Nodes.BaseNode import Node
 from simplegp.Nodes.SymbolicRegressionNodes import *
 from simplegp.Fitness.FitnessFunction import SymbolicRegressionFitness
 from simplegp.Evolution.Evolution import SimpleGP
+import random
 
 np.random.seed(42)
+random.seed(42)
 
 # Choose the dataset from here
 yacht = 'datasets/yacht_full.dat'
