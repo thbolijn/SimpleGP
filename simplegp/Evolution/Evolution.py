@@ -108,6 +108,8 @@ class SimpleGP:
             sorted_population = [population[i] for i in arg_fitness]
             best_sorted = [sorted_population[i] for i in range(int(len(sorted_population) * self.best_top_percent))]
 
+            self.show_treesize_histogram(population)
+
             if self.generations % self.every_n_generation == 0 and self.generations != 0:
                 for p in best_sorted:
                     if len(p.GetSubtree()) > 1:
