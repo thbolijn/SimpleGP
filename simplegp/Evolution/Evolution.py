@@ -2,6 +2,7 @@ import numpy as np
 from numpy.random import random, randint
 import time
 from copy import deepcopy
+import random as rnd
 
 from simplegp.Variation import Variation
 from simplegp.Selection import Selection
@@ -25,7 +26,8 @@ class SimpleGP:
 		max_tree_size=100,
 		tournament_size=4,
 		genetic_algorithm="PSO",
-		every_n_generation=1
+		every_n_generation=1,
+		best_top_percent=0.1
 		):
 
 		self.pop_size = pop_size
@@ -45,6 +47,7 @@ class SimpleGP:
 
 		self.genetic_algorithm = genetic_algorithm
 		self.every_n_generation = every_n_generation
+		self.best_top_percent = best_top_percent
 
 		self.generations = 0
 
@@ -98,27 +101,30 @@ class SimpleGP:
 			PO = population+O
 			population = Selection.TournamentSelect(PO, len(population), tournament_size=self.tournament_size )
 
-			# Here the weights tuning should happen
-			# for p in population:
-				# print(len(p.GetSubtree()))
+			fitness_pop = [p.fitness for p in population]
+			arg_fitness = np.argsort(fitness_pop)
+			sorted_population = [population[i] for i in arg_fitness]
+			best_sorted = [sorted_population[i] for i in range(int(len(sorted_population) * self.best_top_percent))]
+
 
 			if self.generations % self.every_n_generation == 0 and self.generations != 0:
-				for p in population:
-					if self.genetic_algorithm == "PSO":
-						nodes = p.GetSubtree()
-						W = []  # weight vector
-						for n in nodes:
-							W.append(n.weights)
-							# print('\n Weights: ', n.weights)
-						bounds = [(-100, 100)] * len(W) * 2
-						num_particles = 30
-						max_iterations = 50
-						pso = PSO(self.fitness_function.Evaluate, W, bounds, p, num_particles, max_iterations)
-						W = pso.solution()
+				for p in best_sorted:
+					if len(p.GetSubtree()) > 1:
+						if self.genetic_algorithm == "PSO":
+							nodes = p.GetSubtree()
+							W = []  # weight vector
+							for n in nodes:
+								W.append(n.weights)
+								# print('\n Weights: ', n.weights)
+							bounds = [(-100, 100)] * len(W) * 2
+							num_particles = 40
+							max_iterations = 100
+							pso = PSO(self.fitness_function.Evaluate, W, bounds, p, num_particles, max_iterations)
+							W = pso.solution()
 
-					nodes = p.GetSubtree()
-					for n in nodes:
-						n.weights = [W.pop(), W.pop()]
+						nodes = p.GetSubtree()
+						for n in nodes:
+							n.weights = [W.pop(), W.pop()]
 
 
 			self.generations = self.generations + 1
