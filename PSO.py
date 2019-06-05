@@ -87,10 +87,11 @@ class PSO():
         W = []  # weight vector
         for n in nodes:
             W.append(n.weights)
-            print('\n Weights: ', n.weights)
+            # print('\n Weights: ', n.weights)
         # Here the actual tuning should happen W -> EA -> better W
 
         x0 = [item for sublist in W for item in sublist]
+        x0 = [random.uniform(-100, 100) for i in range(len(x0))]
 
         global num_dimensions
 
@@ -122,12 +123,12 @@ class PSO():
                 swarm[j].update_position(bounds)
             i += 1
 
-            print('iteration ' + str(i) + ": " + str(self.err_best_g))
+            # print('iteration ' + str(i) + ": " + str(self.err_best_g))
 
         # print final results
-        print('FINAL:')
-        print(self.pos_best_g)
-        print(self.err_best_g)
+        # print('FINAL:')
+        # print(self.pos_best_g)
+        # print(self.err_best_g)
 
     def solution(self):
         return self.pos_best_g
