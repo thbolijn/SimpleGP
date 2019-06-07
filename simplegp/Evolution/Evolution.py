@@ -27,7 +27,7 @@ class SimpleGP:
             max_tree_size=100,
             tournament_size=4,
             genetic_algorithm="PSO",
-            every_n_generation=1,
+            every_n_generation=50,
             best_top_percent=0.1
     ):
 
@@ -79,6 +79,10 @@ class SimpleGP:
                 Variation.GenerateRandomTree(self.functions, self.terminals, self.initialization_max_tree_height))
             self.fitness_function.Evaluate(population[i])
 
+        repeat = False      # repeat if 3 times in a row the GP gets the same result for elite
+        prev_fitness = 0
+        count_repeat = 0    # number of times the same fitness value got repeated
+
         while not self.__ShouldTerminate():
 
             O = []
@@ -108,12 +112,21 @@ class SimpleGP:
             sorted_population = [population[i] for i in arg_fitness]
             best_sorted = [sorted_population[i] for i in range(int(len(sorted_population) * self.best_top_percent))]
 
-            self.show_treesize_histogram(population)
+            if prev_fitness == np.round(self.fitness_function.elite.fitness, 3):
+                count_repeat += 1
+            else:
+                prev_fitness = np.round(self.fitness_function.elite.fitness, 3)
+                count_repeat = 0
 
-            if self.generations % self.every_n_generation == 0 and self.generations != 0:
-                for p in best_sorted:
-                    if len(p.GetSubtree()) > 1:
-                        if self.genetic_algorithm == "PSO":
+            if count_repeat >= 2:
+                repeat = True
+
+            # if self.generations % self.every_n_generation == 0 and self.generations != 0:
+            if self.genetic_algorithm == "PSO":
+                if repeat:
+                    print('PSO tuning:\n')
+                    for p in population:
+                        if len(p.GetSubtree()) > 1:
                             nodes = p.GetSubtree()
                             W = []  # weight vector
                             for n in nodes:
@@ -122,15 +135,16 @@ class SimpleGP:
                             bounds = [(-25, 25)] * len(W) * 2
                             num_particles = 40
                             max_iterations = 100
-                            pso = PSO(self.fitness_function.Evaluate, W, bounds, p, num_particles, max_iterations)
+                            pso = PSO(self.fitness_function.Evaluate, W, bounds, p, num_particles,
+                                      max_iterations, self.start_time, self.max_time)
                             W = pso.solution()
 
-                        self.show_weight_histogram(W, bounds[0])
+                            nodes = p.GetSubtree()
+                            for n in nodes:
+                                n.weights = [W.pop(), W.pop()]
 
-                        nodes = p.GetSubtree()
-                        for n in nodes:
-                            n.weights = [W.pop(), W.pop()]
-
+                    repeat = False
+                    count_repeat = 0
 
             self.generations = self.generations + 1
 

@@ -18,6 +18,9 @@ from copy import deepcopy
 # --- COST FUNCTION ------------------------------------------------------------+
 
 # function we are attempting to optimize (minimize)
+
+import time
+
 def func1(x):
     total = 0
     for i in range(len(x)):
@@ -81,7 +84,10 @@ class Particle:
 
 
 class PSO():
-    def __init__(self, costFunc, x0, bounds, tree_root, num_particles, maxiter):
+    def __init__(self, costFunc, x0, bounds, tree_root, num_particles, maxiter, start_time, max_time):
+
+        self.start_time = start_time
+        self.max_time = max_time
 
         nodes = tree_root.GetSubtree()
         W = []  # weight vector
@@ -106,7 +112,8 @@ class PSO():
 
         # begin optimization loop
         i = 0
-        while i < maxiter:
+        elapsed_time = 0
+        while i < maxiter and elapsed_time < max_time:
             # print i,err_best_g
             # cycle through particles in swarm and evaluate fitness
             for j in range(0, num_particles):
@@ -124,7 +131,7 @@ class PSO():
             i += 1
 
             # print('iteration ' + str(i) + ": " + str(self.err_best_g))
-
+            elapsed_time = time.time() - self.start_time
         # print final results
         # print('FINAL:')
         # print(self.pos_best_g)
