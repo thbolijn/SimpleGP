@@ -5,6 +5,7 @@ from copy import deepcopy
 
 from simplegp.Variation import Variation
 from simplegp.Selection import Selection
+from simplegp.DifferentialEvolution import DifferentialEvolution
 
 
 class SimpleGP:
@@ -18,11 +19,13 @@ class SimpleGP:
 		crossover_rate=0.5,
 		mutation_rate=0.5,
 		max_evaluations=-1,
-		max_generations=-1,
+		max_generations=50,
 		max_time=-1,
 		initialization_max_tree_height=4,
 		max_tree_size=100,
-		tournament_size=4
+		tournament_size=4,
+		genetic_algorithm="DE",
+		every_n_generation=1
 		):
 
 		self.pop_size = pop_size
@@ -40,6 +43,8 @@ class SimpleGP:
 		self.max_tree_size = max_tree_size
 		self.tournament_size = tournament_size
 
+		self.genetic_algorithm = genetic_algorithm
+		self.every_n_generation = every_n_generation
 		self.generations = 0
 
 
@@ -91,6 +96,25 @@ class SimpleGP:
 
 			PO = population+O
 			population = Selection.TournamentSelect( PO, len(population), tournament_size=self.tournament_size )
+
+			# Here the weights tuning should happen
+
+			for p in population:
+				if self.genetic_algorithm == "DE":
+					nodes = p.GetSubtree()
+					W = []  # weight vector
+					for n in nodes:
+						W.append(n.weights)
+					# 	print('\n Weights: ', n.weights)
+					bounds = [(-10, 10)] * len(W) * 2
+					popsize = 10
+					mutate = 0.5
+					recombination = 0.3
+					maxiter = 25
+					W = DifferentialEvolution.main(self.fitness_function.Evaluate, p, bounds, popsize, mutate, recombination, maxiter)
+
+				for n in nodes:
+					n.weights = [W.pop(), W.pop()] #update DE weight results to tree
 
 			self.generations = self.generations + 1
 

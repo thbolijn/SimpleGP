@@ -4,7 +4,7 @@ from simplegp.Nodes.BaseNode import Node
 
 class AddNode(Node):
 	
-	def __init__(self, with_weights=False):
+	def __init__(self, with_weights=True):
 		super(AddNode,self).__init__(with_weights)
 		self.arity = 2
 
@@ -17,7 +17,7 @@ class AddNode(Node):
 		return (X0 + X1) * self.weights[0] + self.weights[1]
 
 class SubNode(Node):
-	def __init__(self, with_weights=False):
+	def __init__(self, with_weights=True):
 		super(SubNode,self).__init__(with_weights)
 		self.arity = 2
 
@@ -30,7 +30,7 @@ class SubNode(Node):
 		return (X0 - X1) * self.weights[0] + self.weights[1]
 
 class MulNode(Node):
-	def __init__(self, with_weights=False):
+	def __init__(self, with_weights=True):
 		super(MulNode,self).__init__(with_weights)
 		self.arity = 2
 
@@ -43,7 +43,7 @@ class MulNode(Node):
 		return (np.multiply(X0 , X1)) * self.weights[0] + self.weights[1]
 	
 class DivNode(Node):
-	def __init__(self, with_weights=False):
+	def __init__(self, with_weights=True):
 		super(DivNode,self).__init__(with_weights)
 		self.arity = 2
 
@@ -56,7 +56,7 @@ class DivNode(Node):
 		return (np.multiply( np.sign(X1), X0) / ( 1e-2 + np.abs(X1) )) * self.weights[0] + self.weights[1]
 
 class AnalyticQuotientNode(Node):
-	def __init__(self, with_weights=False):
+	def __init__(self, with_weights=True):
 		super(AnalyticQuotientNode,self).__init__(with_weights)
 		self.arity = 2
 
@@ -70,7 +70,7 @@ class AnalyticQuotientNode(Node):
 
 	
 class ExpNode(Node):
-	def __init__(self, with_weights=False):
+	def __init__(self, with_weights=True):
 		super(ExpNode,self).__init__(with_weights)
 		self.arity = 1
 
@@ -83,7 +83,7 @@ class ExpNode(Node):
 
 
 class LogNode(Node):
-	def __init__(self, with_weights=False):
+	def __init__(self, with_weights=True):
 		super(LogNode,self).__init__(with_weights)
 		self.arity = 1
 
@@ -96,7 +96,7 @@ class LogNode(Node):
 
 
 class SinNode(Node):
-	def __init__(self, with_weights=False):
+	def __init__(self, with_weights=True):
 		super(SinNode,self).__init__(with_weights)
 		self.arity = 1
 
@@ -108,7 +108,7 @@ class SinNode(Node):
 		return (np.sin(X0)) * self.weights[0] + self.weights[1]
 
 class CosNode(Node):
-	def __init__(self, with_weights=False):
+	def __init__(self, with_weights=True):
 		super(CosNode,self).__init__(with_weights)
 		self.arity = 1
 
@@ -121,7 +121,7 @@ class CosNode(Node):
 
 
 class FeatureNode(Node):
-	def __init__(self, id, with_weights=False):
+	def __init__(self, id, with_weights=True):
 		super(FeatureNode,self).__init__(with_weights)
 		self.id = id
 
