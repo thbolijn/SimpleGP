@@ -6,6 +6,7 @@ import random as rnd
 
 from simplegp.Variation import Variation
 from simplegp.Selection import Selection
+from simplegp.DifferentialEvolution import DifferentialEvolution
 from PSO import PSO
 import matplotlib.pyplot as plt
 
@@ -26,7 +27,7 @@ class SimpleGP:
             initialization_max_tree_height=10,
             max_tree_size=100,
             tournament_size=4,
-            genetic_algorithm="PSO",
+            genetic_algorithm="DE",
             every_n_generation=1,
             best_top_percent=0.1
     ):
@@ -37,11 +38,9 @@ class SimpleGP:
         self.terminals = terminals
         self.crossover_rate = crossover_rate
         self.mutation_rate = mutation_rate
-
         self.max_evaluations = max_evaluations
         self.max_generations = max_generations
         self.max_time = max_time
-
         self.initialization_max_tree_height = initialization_max_tree_height
         self.max_tree_size = max_tree_size
         self.tournament_size = tournament_size
@@ -52,6 +51,7 @@ class SimpleGP:
 
         self.generations = 0
 
+
     def __ShouldTerminate(self):
         must_terminate = False
         elapsed_time = time.time() - self.start_time
@@ -61,12 +61,9 @@ class SimpleGP:
             must_terminate = True
         elif self.max_time > 0 and elapsed_time >= self.max_time:
             must_terminate = True
-
         if must_terminate:
             print('Terminating at\n\t',
-                  self.generations, 'generations\n\t', self.fitness_function.evaluations, 'evaluations\n\t',
-                  np.round(elapsed_time, 2), 'seconds')
-
+                  self.generations, 'generations\n\t', self.fitness_function.evaluations, 'evaluations\n\t', np.round(elapsed_time,2), 'seconds')
         return must_terminate
 
     def Run(self):
@@ -113,17 +110,27 @@ class SimpleGP:
             if self.generations % self.every_n_generation == 0 and self.generations != 0:
                 for p in best_sorted:
                     if len(p.GetSubtree()) > 1:
+
+                        nodes = p.GetSubtree()
+                        W = []  # weight vector
+                        for n in nodes:
+                            W.append(n.weights)
+                        # 	print('\n Weights: ', n.weights)
+                        bounds = [(-10, 10)] * len(W) * 2
+
                         if self.genetic_algorithm == "PSO":
-                            nodes = p.GetSubtree()
-                            W = []  # weight vector
-                            for n in nodes:
-                                W.append(n.weights)
-                            # print('\n Weights: ', n.weights)
-                            bounds = [(-25, 25)] * len(W) * 2
                             num_particles = 40
                             max_iterations = 100
                             pso = PSO(self.fitness_function.Evaluate, W, bounds, p, num_particles, max_iterations)
                             W = pso.solution()
+
+                        if self.genetic_algorithm == "DE":
+                            popsize = 40
+                            mutate = 0.5
+                            recombination = 0.3
+                            maxiter = 100
+                            W = DifferentialEvolution.main(self.fitness_function.Evaluate, p, bounds, popsize, mutate,
+                                                           recombination, maxiter)
 
                         self.show_weight_histogram(W, bounds[0])
 
@@ -131,6 +138,9 @@ class SimpleGP:
                         for n in nodes:
                             n.weights = [W.pop(), W.pop()]
 
+
+            self.generations = self.generations + 1
+            # Here the weights tuning should happen
 
             self.generations = self.generations + 1
 
