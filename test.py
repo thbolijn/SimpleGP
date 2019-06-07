@@ -28,7 +28,7 @@ heating = 'datasets/energyheating_full.dat'
 tower = 'datasets/tower_full.dat'
 
 # Load regression dataset
-df = pd.read_csv(tower, header=None, delimiter=' ')		# Replace the corresponding string for a certain data-set
+df = pd.read_csv(boston, header=None, delimiter=' ')		# Replace the corresponding string for a certain data-set
 
 X = df.iloc[:, :-1]
 y = df.iloc[:, -1]
@@ -37,7 +37,7 @@ X = X.values
 y = y.values
 
 # Take a dataset split
-X_train, X_test, y_train, y_test = train_test_split( X, y, test_size=0.5, random_state=42 )
+X_train, X_test, y_train, y_test = train_test_split( X, y, test_size=0.5, random_state=42)
 # Set fitness function
 fitness_function = SymbolicRegressionFitness( X_train, y_train )
 
@@ -48,7 +48,7 @@ for i in range(X.shape[1]):
 	terminals.append(FeatureNode(i))	# add a feature node for each feature
 
 # Run GP
-sgp = SimpleGP(fitness_function, functions, terminals, pop_size=100, max_generations=5)	# other parameters are optional
+sgp = SimpleGP(fitness_function, functions, terminals, pop_size=100, max_time=100, genetic_algorithm='PSO')	# other parameters are optional
 sgp.Run()
 
 # Print results
