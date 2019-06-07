@@ -48,7 +48,7 @@ for i in range(X.shape[1]):
 	terminals.append(FeatureNode(i))	# add a feature node for each feature
 
 # Run GP
-sgp = SimpleGP(fitness_function, functions, terminals, pop_size=100, max_time=100, genetic_algorithm='PSO')	# other parameters are optional
+sgp = SimpleGP(fitness_function, functions, terminals, pop_size=100, max_time=20, genetic_algorithm='DE')	# other parameters are optional
 sgp.Run()
 
 # Print results
