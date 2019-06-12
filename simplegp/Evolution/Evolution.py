@@ -162,7 +162,7 @@ class SimpleGP:
             print('g:', self.generations, 'elite fitness:', np.round(self.fitness_function.elite.fitness, 3), ', size:',
                   len(self.fitness_function.elite.GetSubtree()))
 
-            return self.spreadsheet_string()
+        return self.spreadsheet_string()
 
     def show_treesize_histogram(self, population):
         treesizes = []
