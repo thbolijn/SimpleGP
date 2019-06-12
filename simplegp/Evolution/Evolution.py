@@ -124,7 +124,7 @@ class SimpleGP:
                 repeat = True
 
             # if self.generations % self.every_n_generation == 0 and self.generations != 0:
-            if repeat and self.genetic_algorithm is not None:
+            if repeat and self.genetic_algorithm:
                 print(self.genetic_algorithm, 'tuning on', len(best_sorted), 'of', len(population), 'trees:')
                 for p in tqdm(best_sorted):
                     if len(p.GetSubtree()) > 1:

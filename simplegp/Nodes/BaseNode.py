@@ -4,19 +4,14 @@ import random as rnd
 
 class Node:		# Base class with general functionalities
 
-	def __init__(self, with_weights=False):
+	def __init__(self):
 		self.fitness = np.inf
 		self.parent = None
 		self.arity = 0	# arity is the number of expected inputs
 		self._children = []
 		self.weights = []
-
-		if with_weights:
-			self.weights.append(rnd.uniform(-10, 10))
-			self.weights.append(rnd.uniform(-10, 10))
-		else:
-			self.weights.append(1)
-			self.weights.append(0)
+		self.weights.append(1)
+		self.weights.append(0)
 
 	def GetSubtree(self):
 		result = []
