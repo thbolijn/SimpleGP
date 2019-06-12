@@ -119,7 +119,9 @@ class SimpleGP:
 
             if self.weight_tune_percent != 1:
                 if self.weight_tune_selection == "random":
-                    pass  # TODO: implement this
+                    selection = list(range(len(population)))
+                    rnd.shuffle(selection)
+                    selected_population = [population[i] for i in selection]
                 else:
                     fitness_pop = [p.fitness for p in population]
                     arg_fitness = np.argsort(fitness_pop)
@@ -212,8 +214,8 @@ class SimpleGP:
         myList = [self.generations, self.fitness_function.evaluations, elapsed_time, self.pop_size, self.crossover_rate,
                   self.mutation_rate, self.max_evaluations, self.max_generations, self.max_time,
                   self.initialization_max_tree_height, self.max_tree_size, self.tournament_size, self.genetic_algorithm,
-                  self.every_n_generation, self.weight_tune_percent, self.weight_tune_selection,
-                  self.ga_population_size, self.ga_iterations, self.de_mutation_rate, self.de_recombination_rate]
+                  self.weight_tune_percent, self.weight_tune_selection, self.ga_population_size, self.ga_iterations,
+                  self.de_mutation_rate, self.de_recombination_rate]
         result = ','.join(map(str, myList))
         return result
 
