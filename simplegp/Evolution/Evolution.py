@@ -9,6 +9,7 @@ from simplegp.Selection import Selection
 from simplegp.DifferentialEvolution import DifferentialEvolution
 from PSO import PSO
 import matplotlib.pyplot as plt
+from tqdm import tqdm
 
 
 class SimpleGP:
@@ -23,13 +24,13 @@ class SimpleGP:
             mutation_rate=0.5,
             max_evaluations=-1,
             max_generations=-1,
-            max_time=20,
-            initialization_max_tree_height=10,
-            max_tree_size=100,
-            tournament_size=4,
+            max_time=60,
+            initialization_max_tree_height=4,
+            max_tree_size=20,
+            tournament_size=2,
             genetic_algorithm="PSO",
             every_n_generation=1,
-            best_top_percent=0.1
+            best_top_percent=0.05  # Put to 1 if all trees should be weight-tuned
     ):
 
         self.pop_size = pop_size
@@ -70,7 +71,6 @@ class SimpleGP:
         return must_terminate
 
     def Run(self):
-
         self.start_time = time.time()
 
         population = []
@@ -112,6 +112,9 @@ class SimpleGP:
             sorted_population = [population[i] for i in arg_fitness]
             best_sorted = [sorted_population[i] for i in range(int(len(sorted_population) * self.best_top_percent))]
 
+            self.show_treesize_histogram(population)
+            self.show_treesize_histogram(best_sorted)
+
             if prev_fitness == np.round(self.fitness_function.elite.fitness, 3):
                 count_repeat += 1
             else:
@@ -123,8 +126,8 @@ class SimpleGP:
 
             # if self.generations % self.every_n_generation == 0 and self.generations != 0:
             if repeat and self.genetic_algorithm is not None:
-                print(self.genetic_algorithm, ' tuning: \n')
-                for p in population:
+                print(self.genetic_algorithm, 'tuning on', len(best_sorted), 'of', len(population), 'trees:')
+                for p in tqdm(best_sorted):
                     if len(p.GetSubtree()) > 1:
                         nodes = p.GetSubtree()
                         W = []  # weight vector
@@ -159,6 +162,8 @@ class SimpleGP:
             print('g:', self.generations, 'elite fitness:', np.round(self.fitness_function.elite.fitness, 3), ', size:',
                   len(self.fitness_function.elite.GetSubtree()))
 
+            return self.spreadsheet_string()
+
     def show_treesize_histogram(self, population):
         treesizes = []
         for p in population:
@@ -166,6 +171,13 @@ class SimpleGP:
         # print(treesizes)
         plt.hist(treesizes, bins=range(1, self.max_tree_size))
         plt.show()
+
+    def spreadsheet_string(self):
+        myList = [self.pop_size, self.crossover_rate, self.mutation_rate, self.max_evaluations, self.max_generations,
+                  self.max_time, self.initialization_max_tree_height, self.max_tree_size, self.tournament_size,
+                  self.genetic_algorithm, self.every_n_generation, self.best_top_percent]
+        result = ','.join(map(str, myList))
+        return result
 
     def show_weight_histogram(self, weights, bounds):
         plt.hist(weights, range=bounds, bins=range(bounds[0], bounds[1], 2))
