@@ -10,8 +10,7 @@ def GenerateRandomTree(functions, terminals, max_height, curr_height=0):
 		idx = randint(len(terminals))
 		n = deepcopy( terminals[idx] )
 	else:
-		# Make sure that there is no tree generated with only one node
-		if curr_height > 0 and random() < 0.5:
+		if random() < 0.5:
 			n = deepcopy( terminals[randint(len(terminals))] )
 		else:
 			idx = randint( len(functions) )
