@@ -112,8 +112,7 @@ class SimpleGP:
             sorted_population = [population[i] for i in arg_fitness]
             best_sorted = [sorted_population[i] for i in range(int(len(sorted_population) * self.best_top_percent))]
 
-            self.show_treesize_histogram(population)
-            self.show_treesize_histogram(best_sorted)
+            self.show_best_treesize_histogram(best_sorted, population)
 
             if prev_fitness == np.round(self.fitness_function.elite.fitness, 3):
                 count_repeat += 1
@@ -171,6 +170,20 @@ class SimpleGP:
         # print(treesizes)
         plt.hist(treesizes, bins=range(1, self.max_tree_size))
         plt.show()
+
+    def show_best_treesize_histogram(self, best_population, total_population):
+        total_treesizes = []
+        for p in total_population:
+            total_treesizes.append(len(p.GetSubtree()))
+        best_treesizes = []
+        for p in best_population:
+            best_treesizes.append(len(p.GetSubtree()))
+        bins = range(1, self.max_tree_size)
+        plt.hist(total_treesizes, bins, label="total population")
+        plt.hist(best_treesizes, bins, label="best population")
+        plt.legend(loc='upper right')
+        plt.show()
+
 
     def spreadsheet_string(self):
         myList = [self.pop_size, self.crossover_rate, self.mutation_rate, self.max_evaluations, self.max_generations,
