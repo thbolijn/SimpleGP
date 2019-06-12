@@ -29,6 +29,10 @@ class SimpleGP:
             max_tree_size=20,
             tournament_size=2,
             genetic_algorithm="PSO",
+            ga_population_size=40,
+            ga_iterations=100,
+            de_mutation_rate=0.5,
+            de_recombination_rate=0.5,
             every_n_generation=1,
             best_top_percent=0.1  # Put to 1 if all trees should be weight-tuned
     ):
@@ -45,6 +49,10 @@ class SimpleGP:
         self.initialization_max_tree_height = initialization_max_tree_height
         self.max_tree_size = max_tree_size
         self.tournament_size = tournament_size
+        self.de_mutation_rate = de_mutation_rate
+        self.de_recombination_rate = de_recombination_rate
+        self.ga_iterations = ga_iterations
+        self.ga_population_size = ga_population_size
 
         self.genetic_algorithm = genetic_algorithm
         self.every_n_generation = every_n_generation
@@ -136,19 +144,19 @@ class SimpleGP:
                         # bounds needed for both algorithms
                         bounds = [(-25, 25)] * len(W) * 2
                         if self.genetic_algorithm == "PSO":
-                            num_particles = 40
-                            max_iterations = 100
-                            pso = PSO(self.fitness_function.Evaluate, W, bounds, p, num_particles,
-                                      max_iterations, self.start_time, self.max_time)
+                            #self.ga_population_size = 40
+                            #self.ga_max_iterations = 100
+                            pso = PSO(self.fitness_function.Evaluate, W, bounds, p, self.ga_population_size,
+                                      self.ga_iterations, self.start_time, self.max_time)
                             W = pso.solution()
 
                         elif self.genetic_algorithm == "DE":
-                            popsize = 40
-                            mutate = 0.5
-                            recombination = 0.3
-                            maxiter = 100
-                            W = DifferentialEvolution.main(self.fitness_function.Evaluate, p, bounds, popsize, mutate,
-                                                           recombination, maxiter, self.start_time, self.max_time)
+                            #self.ga_population_size = 40
+                            #self.ga_max_iterations = 100
+                            #self.de_mutation_rate = 0.5
+                            #self.de_recombination_rate = 0.8
+                            W = DifferentialEvolution.main(self.fitness_function.Evaluate, p, bounds, self.ga_population_size, self.de_mutation_rate,
+                                                           self.de_recombination_rate, self.ga_iterations, self.start_time, self.max_time)
 
                         nodes = p.GetSubtree()
                         for n in nodes:
@@ -188,9 +196,10 @@ class SimpleGP:
 
     def spreadsheet_string(self):
         elapsed_time = np.round(time.time() - self.start_time, 2)
-        myList = [self.generations, self.fitness_function.evaluations, elapsed_time, self.pop_size, self.crossover_rate, self.mutation_rate, self.max_evaluations, self.max_generations,
-                  self.max_time, self.initialization_max_tree_height, self.max_tree_size, self.tournament_size,
-                  self.genetic_algorithm, self.every_n_generation, self.best_top_percent]
+        myList = [self.generations, self.fitness_function.evaluations, elapsed_time, self.pop_size, self.crossover_rate,
+                  self.mutation_rate, self.max_evaluations, self.max_generations, self.max_time, self.initialization_max_tree_height,
+                  self.max_tree_size, self.tournament_size, self.genetic_algorithm, self.every_n_generation, self.best_top_percent,
+                  self.ga_population_size, self.ga_iterations, self.de_mutation_rate, self.de_recombination_rate]
         result = ','.join(map(str, myList))
         return result
 
