@@ -109,13 +109,14 @@ def main(cost_func, p, bounds, popsize, mutate, recombination, maxiter):
                 n.weights = [positions.pop(), positions.pop()]
             score_trial = cost_func(p)
 
-            positions = deepcopy(x_t) # TODO: Is double deepcopy needed or can positions just be updated? Does it matter?
+            #positions = deepcopy(x_t) # TODO: Is double deepcopy needed or can positions just be updated? Does it matter?
+            positions = x_t
             for n in nodes:
                 n.weights = [positions.pop(), positions.pop()]
 
             score_target = cost_func(p)
 
-            if score_trial < score_target: #TODO: assignment is minimalization or maximalization?
+            if score_trial < score_target:
                 newPopulation.append(v_trial)
                 gen_scores.append(score_trial)
                 #print('   >', score_trial, v_trial)
