@@ -2,6 +2,7 @@
 
 import random
 from copy import deepcopy
+import time
 
 # --- EXAMPLE COST FUNCTIONS ---------------------------------------------------+
 
@@ -43,7 +44,7 @@ def ensure_bounds(vec, bounds):
 
 # --- MAIN ---------------------------------------------------------------------+
 
-def main(cost_func, p, bounds, popsize, mutate, recombination, maxiter):
+def main(cost_func, p, bounds, popsize, mutate, recombination, maxiter, start_time, max_time):
 
     # --- INITIALIZE A POPULATION (step #1) ----------------+
 
@@ -63,6 +64,7 @@ def main(cost_func, p, bounds, popsize, mutate, recombination, maxiter):
     #     W.append(n.weights)
     #     print('\n Weights: ', n.weights)
     # cycle through each generation (step #2)
+    elapsed_time = 0
     for i in range(1, maxiter + 1):
         #print('GENERATION:', i)
 
@@ -109,8 +111,8 @@ def main(cost_func, p, bounds, popsize, mutate, recombination, maxiter):
                 n.weights = [positions.pop(), positions.pop()]
             score_trial = cost_func(p)
 
-            #positions = deepcopy(x_t) # TODO: Is double deepcopy needed or can positions just be updated? Does it matter?
-            positions = x_t
+            positions = deepcopy(x_t) # TODO: Is double deepcopy needed or can positions just be updated? Does it matter?
+            # positions = x_t
             for n in nodes:
                 n.weights = [positions.pop(), positions.pop()]
 
@@ -126,15 +128,19 @@ def main(cost_func, p, bounds, popsize, mutate, recombination, maxiter):
                 #print('   >', score_target, x_t)
                 gen_scores.append(score_target)
 
+            elapsed_time = time.time() - start_time
+
+            if elapsed_time > max_time:
+                break
+
         # --- SCORE KEEPING --------------------------------+
         population = newPopulation
         #gen_avg = sum(gen_scores) / popsize  # current generation avg. fitness
         gen_best = min(gen_scores)  # fitness of best individual
         gen_sol = population[gen_scores.index(min(gen_scores))]  # solution of best individual
 
-        #print('      > GENERATION AVERAGE:', gen_avg)
-        #print('      > GENERATION BEST:', gen_best)
-        #print('         > BEST SOLUTION:', gen_sol, '\n')
+        if elapsed_time > max_time:
+            break
 
     return gen_sol
 

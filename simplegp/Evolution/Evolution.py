@@ -23,7 +23,7 @@ class SimpleGP:
             mutation_rate=0.5,
             max_evaluations=-1,
             max_generations=-1,
-            max_time=-1,
+            max_time=20,
             initialization_max_tree_height=10,
             max_tree_size=100,
             tournament_size=4,
@@ -130,22 +130,22 @@ class SimpleGP:
                         W = []  # weight vector
                         for n in nodes:
                             W.append(n.weights)
-                    # bounds needed for both algorithms
-                    bounds = [(-25, 25)] * len(W) * 2
-                    if self.genetic_algorithm == "PSO":
-                        num_particles = 40
-                        max_iterations = 100
-                        pso = PSO(self.fitness_function.Evaluate, W, bounds, p, num_particles,
-                                  max_iterations, self.start_time, self.max_time)
-                        W = pso.solution()
+                        # bounds needed for both algorithms
+                        bounds = [(-25, 25)] * len(W) * 2
+                        if self.genetic_algorithm == "PSO":
+                            num_particles = 40
+                            max_iterations = 100
+                            pso = PSO(self.fitness_function.Evaluate, W, bounds, p, num_particles,
+                                      max_iterations, self.start_time, self.max_time)
+                            W = pso.solution()
 
-                    elif self.genetic_algorithm == "DE":
-                        popsize = 40
-                        mutate = 0.5
-                        recombination = 0.3
-                        maxiter = 100
-                        W = DifferentialEvolution.main(self.fitness_function.Evaluate, p, bounds, popsize, mutate,
-                                                       recombination, maxiter, self.start_time, self.max_time)
+                        elif self.genetic_algorithm == "DE":
+                            popsize = 40
+                            mutate = 0.5
+                            recombination = 0.3
+                            maxiter = 100
+                            W = DifferentialEvolution.main(self.fitness_function.Evaluate, p, bounds, popsize, mutate,
+                                                           recombination, maxiter, self.start_time, self.max_time)
 
                 nodes = p.GetSubtree()
                 for n in nodes:
