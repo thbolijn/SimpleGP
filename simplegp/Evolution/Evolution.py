@@ -186,7 +186,8 @@ class SimpleGP:
 
 
     def spreadsheet_string(self):
-        myList = [self.pop_size, self.crossover_rate, self.mutation_rate, self.max_evaluations, self.max_generations,
+        elapsed_time = np.round(time.time() - self.start_time, 2)
+        myList = [self.generations, self.fitness_function.evaluations, elapsed_time, self.pop_size, self.crossover_rate, self.mutation_rate, self.max_evaluations, self.max_generations,
                   self.max_time, self.initialization_max_tree_height, self.max_tree_size, self.tournament_size,
                   self.genetic_algorithm, self.every_n_generation, self.best_top_percent]
         result = ','.join(map(str, myList))
