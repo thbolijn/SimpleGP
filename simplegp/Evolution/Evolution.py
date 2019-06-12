@@ -30,7 +30,7 @@ class SimpleGP:
             tournament_size=2,
             genetic_algorithm="PSO",
             every_n_generation=1,
-            best_top_percent=0.05  # Put to 1 if all trees should be weight-tuned
+            best_top_percent=0.1  # Put to 1 if all trees should be weight-tuned
     ):
 
         self.pop_size = pop_size
@@ -110,9 +110,10 @@ class SimpleGP:
             fitness_pop = [p.fitness for p in population]
             arg_fitness = np.argsort(fitness_pop)
             sorted_population = [population[i] for i in arg_fitness]
+
             best_sorted = [sorted_population[i] for i in range(int(len(sorted_population) * self.best_top_percent))]
 
-            self.show_best_treesize_histogram(best_sorted, population)
+            # self.show_best_treesize_histogram(best_sorted, population)
 
             if prev_fitness == np.round(self.fitness_function.elite.fitness, 3):
                 count_repeat += 1
@@ -149,9 +150,9 @@ class SimpleGP:
                             W = DifferentialEvolution.main(self.fitness_function.Evaluate, p, bounds, popsize, mutate,
                                                            recombination, maxiter, self.start_time, self.max_time)
 
-                nodes = p.GetSubtree()
-                for n in nodes:
-                    n.weights = [W.pop(), W.pop()]
+                        nodes = p.GetSubtree()
+                        for n in nodes:
+                            n.weights = [W.pop(), W.pop()]
 
                 repeat = False
                 count_repeat = 0
