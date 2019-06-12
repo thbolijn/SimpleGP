@@ -48,7 +48,7 @@ test_mse_list = []
 train_R_list = []
 test_R_list = []
 
-no_repetitions = 10
+no_repetitions = 2
 
 for whatever in range(no_repetitions):
 
@@ -84,10 +84,6 @@ for whatever in range(no_repetitions):
     print('Test:\n\tMSE:', test_mse,
         '\n\tRsquared:', test_Rsquared)
 
-    result = ','.join(map(str, [dataset, seed_no, test_size, training_MSE, training_Rsquared, test_mse,
-                                test_Rsquared, spreadsheet_string]))
-    print(result)
-
     train_mse_list.append(training_MSE)
     test_mse_list.append(test_mse)
     train_R_list.append(training_Rsquared)
@@ -110,3 +106,7 @@ print(f'Train mean MSE: {avg_train_mse}\t Train std MSE: {std_train_mse}'
       f'\nTrain mean R squared: {avg_train_R}\t Train std R squared: {std_train_R}'
       f'\nTest mean MSE: {avg_test_mse}\t Test std MSE: {std_test_mse}'
       f'\nTest mean R squared: {avg_test_R}\t Test std R squared: {std_test_R}')
+
+result = ','.join(map(str, [dataset, seed_no, test_size, np.round(avg_train_mse, 3), np.round(avg_train_R, 3),
+							np.round(avg_test_mse, 3), np.round(avg_test_R, 3), no_repetitions, spreadsheet_string]))
+print(result)
