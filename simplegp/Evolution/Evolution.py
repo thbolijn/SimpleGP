@@ -27,7 +27,7 @@ class SimpleGP:
             initialization_max_tree_height=10,
             max_tree_size=100,
             tournament_size=4,
-            genetic_algorithm="DE",
+            genetic_algorithm="PSO",
             every_n_generation=1,
             best_top_percent=0.1
     ):
@@ -61,9 +61,12 @@ class SimpleGP:
             must_terminate = True
         elif self.max_time > 0 and elapsed_time >= self.max_time:
             must_terminate = True
+
         if must_terminate:
             print('Terminating at\n\t',
-                  self.generations, 'generations\n\t', self.fitness_function.evaluations, 'evaluations\n\t', np.round(elapsed_time,2), 'seconds')
+                  self.generations, 'generations\n\t', self.fitness_function.evaluations, 'evaluations\n\t',
+                  np.round(elapsed_time, 2), 'seconds')
+
         return must_terminate
 
     def Run(self):
@@ -75,6 +78,10 @@ class SimpleGP:
             population.append(
                 Variation.GenerateRandomTree(self.functions, self.terminals, self.initialization_max_tree_height))
             self.fitness_function.Evaluate(population[i])
+
+        repeat = False      # repeat if 3 times in a row the GP gets the same result for elite
+        prev_fitness = 0
+        count_repeat = 0    # number of times the same fitness value got repeated
 
         while not self.__ShouldTerminate():
 
@@ -105,42 +112,47 @@ class SimpleGP:
             sorted_population = [population[i] for i in arg_fitness]
             best_sorted = [sorted_population[i] for i in range(int(len(sorted_population) * self.best_top_percent))]
 
-            self.show_treesize_histogram(population)
+            if prev_fitness == np.round(self.fitness_function.elite.fitness, 3):
+                count_repeat += 1
+            else:
+                prev_fitness = np.round(self.fitness_function.elite.fitness, 3)
+                count_repeat = 0
 
-            if self.generations % self.every_n_generation == 0 and self.generations != 0:
-                for p in best_sorted:
+            if count_repeat >= 2:
+                repeat = True
+
+            # if self.generations % self.every_n_generation == 0 and self.generations != 0:
+            if repeat and self.genetic_algorithm is not None:
+                print(self.genetic_algorithm, ' tuning: \n')
+                for p in population:
                     if len(p.GetSubtree()) > 1:
-
                         nodes = p.GetSubtree()
                         W = []  # weight vector
                         for n in nodes:
                             W.append(n.weights)
-                        # 	print('\n Weights: ', n.weights)
-                        bounds = [(-10, 10)] * len(W) * 2
+                    # bounds needed for both algorithms
+                    bounds = [(-25, 25)] * len(W) * 2
+                    if self.genetic_algorithm == "PSO":
+                        num_particles = 40
+                        max_iterations = 100
+                        pso = PSO(self.fitness_function.Evaluate, W, bounds, p, num_particles,
+                                  max_iterations, self.start_time, self.max_time)
+                        W = pso.solution()
 
-                        if self.genetic_algorithm == "PSO":
-                            num_particles = 40
-                            max_iterations = 100
-                            pso = PSO(self.fitness_function.Evaluate, W, bounds, p, num_particles, max_iterations)
-                            W = pso.solution()
+                    elif self.genetic_algorithm == "DE":
+                        popsize = 40
+                        mutate = 0.5
+                        recombination = 0.3
+                        maxiter = 100
+                        W = DifferentialEvolution.main(self.fitness_function.Evaluate, p, bounds, popsize, mutate,
+                                                       recombination, maxiter, self.start_time, self.max_time)
 
-                        if self.genetic_algorithm == "DE":
-                            popsize = 40
-                            mutate = 0.5
-                            recombination = 0.3
-                            maxiter = 100
-                            W = DifferentialEvolution.main(self.fitness_function.Evaluate, p, bounds, popsize, mutate,
-                                                           recombination, maxiter)
+                nodes = p.GetSubtree()
+                for n in nodes:
+                    n.weights = [W.pop(), W.pop()]
 
-                        self.show_weight_histogram(W, bounds[0])
-
-                        nodes = p.GetSubtree()
-                        for n in nodes:
-                            n.weights = [W.pop(), W.pop()]
-
-
-            self.generations = self.generations + 1
-            # Here the weights tuning should happen
+                repeat = False
+                count_repeat = 0
 
             self.generations = self.generations + 1
 
