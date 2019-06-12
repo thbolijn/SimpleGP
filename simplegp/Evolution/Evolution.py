@@ -157,9 +157,9 @@ class SimpleGP:
                             W = DifferentialEvolution.main(self.fitness_function.Evaluate, p, bounds, self.ga_population_size, self.de_mutation_rate,
                                                            self.de_recombination_rate, self.ga_iterations, self.start_time, self.max_time)
 
-                nodes = p.GetSubtree()
-                for n in nodes:
-                    n.weights = [W.pop(), W.pop()]
+                        nodes = p.GetSubtree()
+                        for n in nodes:
+                            n.weights = [W.pop(), W.pop()]
 
                 repeat = False
                 count_repeat = 0
@@ -194,7 +194,6 @@ class SimpleGP:
 
 
     def spreadsheet_string(self):
-
         elapsed_time = np.round(time.time() - self.start_time, 2)
         myList = [self.generations, self.fitness_function.evaluations, elapsed_time, self.pop_size, self.crossover_rate,
                   self.mutation_rate, self.max_evaluations, self.max_generations, self.max_time, self.initialization_max_tree_height,
