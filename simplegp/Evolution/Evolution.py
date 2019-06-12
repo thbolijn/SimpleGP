@@ -29,12 +29,13 @@ class SimpleGP:
             max_tree_size=20,
             tournament_size=2,
             genetic_algorithm="PSO",
+            every_n_generation=1,
+            weight_tune_percent=0.05,  # Put to 1 if all trees should be weight-tuned
+            weight_tune_selection="worst",  # Choose from "best", "worst", "random"
             ga_population_size=40,
             ga_iterations=100,
-            de_mutation_rate=0.5,
-            de_recombination_rate=0.5,
-            every_n_generation=1,
-            best_top_percent=0.1  # Put to 1 if all trees should be weight-tuned
+            de_mutation_rate=0.3,
+            de_recombination_rate=0.3
     ):
 
         self.pop_size = pop_size
@@ -56,7 +57,8 @@ class SimpleGP:
 
         self.genetic_algorithm = genetic_algorithm
         self.every_n_generation = every_n_generation
-        self.best_top_percent = best_top_percent
+        self.weight_tune_percent = weight_tune_percent
+        self.weight_tune_selection = weight_tune_selection
 
         self.generations = 0
 
@@ -115,13 +117,24 @@ class SimpleGP:
             PO = population + O
             population = Selection.TournamentSelect(PO, len(population), tournament_size=self.tournament_size)
 
-            fitness_pop = [p.fitness for p in population]
-            arg_fitness = np.argsort(fitness_pop)
-            sorted_population = [population[i] for i in arg_fitness]
+            if self.weight_tune_percent != 1:
+                if self.weight_tune_selection == "random":
+                    pass  # TODO: implement this
+                else:
+                    fitness_pop = [p.fitness for p in population]
+                    arg_fitness = np.argsort(fitness_pop)
+                    sorted_population = [population[i] for i in arg_fitness]
+                    if self.weight_tune_selection == "best":
+                        selection = range(int(len(sorted_population) * self.weight_tune_percent))
+                        selected_population = [sorted_population[i] for i in selection]
+                    elif self.weight_tune_selection == "worst":
+                        total = len(sorted_population)
+                        selection = range(int(total - self.weight_tune_percent * total), total)
+                        selected_population = [sorted_population[i] for i in selection]
+            else:
+                selected_population = population
 
-            best_sorted = [sorted_population[i] for i in range(int(len(sorted_population) * self.best_top_percent))]
-
-            # self.show_best_treesize_histogram(best_sorted, population)
+            # self.show_best_treesize_histogram(selected_population, population)
 
             if prev_fitness == np.round(self.fitness_function.elite.fitness, 3):
                 count_repeat += 1
@@ -134,8 +147,8 @@ class SimpleGP:
 
             # if self.generations % self.every_n_generation == 0 and self.generations != 0:
             if repeat and self.genetic_algorithm:
-                print(self.genetic_algorithm, 'tuning on', len(best_sorted), 'of', len(population), 'trees:')
-                for p in tqdm(best_sorted):
+                print(self.genetic_algorithm, 'tuning on', self.weight_tune_selection, len(selected_population), 'of', len(population), 'trees:')
+                for p in tqdm(selected_population):
                     if len(p.GetSubtree()) > 1:
                         nodes = p.GetSubtree()
                         W = []  # weight vector
@@ -197,8 +210,9 @@ class SimpleGP:
     def spreadsheet_string(self):
         elapsed_time = np.round(time.time() - self.start_time, 2)
         myList = [self.generations, self.fitness_function.evaluations, elapsed_time, self.pop_size, self.crossover_rate,
-                  self.mutation_rate, self.max_evaluations, self.max_generations, self.max_time, self.initialization_max_tree_height,
-                  self.max_tree_size, self.tournament_size, self.genetic_algorithm, self.every_n_generation, self.best_top_percent,
+                  self.mutation_rate, self.max_evaluations, self.max_generations, self.max_time,
+                  self.initialization_max_tree_height, self.max_tree_size, self.tournament_size, self.genetic_algorithm,
+                  self.every_n_generation, self.weight_tune_percent, self.weight_tune_selection,
                   self.ga_population_size, self.ga_iterations, self.de_mutation_rate, self.de_recombination_rate]
         result = ','.join(map(str, myList))
         return result
