@@ -62,7 +62,6 @@ class SimpleGP:
 
         self.generations = 0
 
-
     def __ShouldTerminate(self):
         must_terminate = False
         elapsed_time = time.time() - self.start_time
@@ -117,25 +116,6 @@ class SimpleGP:
             PO = population + O
             population = Selection.TournamentSelect(PO, len(population), tournament_size=self.tournament_size)
 
-            if self.weight_tune_percent != 1:
-                if self.weight_tune_selection == "random":
-                    selection = list(range(len(population)))
-                    rnd.shuffle(selection)
-                    selected_population = [population[i] for i in selection]
-                else:
-                    fitness_pop = [p.fitness for p in population]
-                    arg_fitness = np.argsort(fitness_pop)
-                    sorted_population = [population[i] for i in arg_fitness]
-                    if self.weight_tune_selection == "best":
-                        selection = range(int(len(sorted_population) * self.weight_tune_percent))
-                        selected_population = [sorted_population[i] for i in selection]
-                    elif self.weight_tune_selection == "worst":
-                        total = len(sorted_population)
-                        selection = range(int(total - self.weight_tune_percent * total), total)
-                        selected_population = [sorted_population[i] for i in selection]
-            else:
-                selected_population = population
-
             # self.show_best_treesize_histogram(selected_population, population)
 
             if prev_fitness == np.round(self.fitness_function.elite.fitness, 3):
@@ -149,6 +129,28 @@ class SimpleGP:
 
             # if self.generations % self.every_n_generation == 0 and self.generations != 0:
             if repeat and self.genetic_algorithm:
+
+                # Do the selection on the current population
+                if self.weight_tune_percent != 1:
+                    if self.weight_tune_selection == "random":
+                        selection = list(range(len(population)))
+                        rnd.shuffle(selection)
+                        selected_population = [population[i] for i in selection]
+                    else:
+                        fitness_pop = [p.fitness for p in population]
+                        arg_fitness = np.argsort(fitness_pop)
+                        sorted_population = [population[i] for i in arg_fitness]
+                        if self.weight_tune_selection == "best":
+                            selection = range(int(len(sorted_population) * self.weight_tune_percent))
+                            selected_population = [sorted_population[i] for i in selection]
+                        elif self.weight_tune_selection == "worst":
+                            total = len(sorted_population)
+                            selection = range(int(total - self.weight_tune_percent * total), total)
+                            selected_population = [sorted_population[i] for i in selection]
+                else:
+                    selected_population = population
+
+                # Tune the weights for every tree in the selected population
                 print(self.genetic_algorithm, 'tuning on', self.weight_tune_selection, len(selected_population), 'of', len(population), 'trees:')
                 for p in tqdm(selected_population):
                     if len(p.GetSubtree()) > 1:
@@ -159,17 +161,11 @@ class SimpleGP:
                         # bounds needed for both algorithms
                         bounds = [(-25, 25)] * len(W) * 2
                         if self.genetic_algorithm == "PSO":
-                            #self.ga_population_size = 40
-                            #self.ga_max_iterations = 100
                             pso = PSO(self.fitness_function.Evaluate, W, bounds, p, self.ga_population_size,
                                       self.ga_iterations, self.start_time, self.max_time)
                             W = pso.solution()
 
                         elif self.genetic_algorithm == "DE":
-                            #self.ga_population_size = 40
-                            #self.ga_max_iterations = 100
-                            #self.de_mutation_rate = 0.5
-                            #self.de_recombination_rate = 0.8
                             W = DifferentialEvolution.main(self.fitness_function.Evaluate, p, bounds, self.ga_population_size, self.de_mutation_rate,
                                                            self.de_recombination_rate, self.ga_iterations, self.start_time, self.max_time)
 
@@ -207,7 +203,6 @@ class SimpleGP:
         plt.hist(best_treesizes, bins, label="best population")
         plt.legend(loc='upper right')
         plt.show()
-
 
     def spreadsheet_string(self):
         elapsed_time = np.round(time.time() - self.start_time, 2)
