@@ -72,10 +72,10 @@ class SimpleGP:
         elif self.max_time > 0 and elapsed_time >= self.max_time:
             must_terminate = True
 
-        if must_terminate:
-            print('Terminating at\n\t',
-                  self.generations, 'generations\n\t', self.fitness_function.evaluations, 'evaluations\n\t',
-                  np.round(elapsed_time, 2), 'seconds')
+        # if must_terminate:
+        #     print('Terminating at\n\t',
+        #           self.generations, 'generations\n\t', self.fitness_function.evaluations, 'evaluations\n\t',
+        #           np.round(elapsed_time, 2), 'seconds')
 
         return must_terminate
 
@@ -151,7 +151,7 @@ class SimpleGP:
                     selected_population = population
 
                 # Tune the weights for every tree in the selected population
-                print(self.genetic_algorithm, 'tuning on', self.weight_tune_selection, len(selected_population), 'of', len(population), 'trees:')
+                # print(self.genetic_algorithm, 'tuning on', self.weight_tune_selection, len(selected_population), 'of', len(population), 'trees:')
                 for p in tqdm(selected_population):
                     if len(p.GetSubtree()) > 1:
                         nodes = p.GetSubtree()
@@ -178,8 +178,8 @@ class SimpleGP:
 
             self.generations = self.generations + 1
 
-            print('g:', self.generations, 'elite fitness:', np.round(self.fitness_function.elite.fitness, 3), ', size:',
-                  len(self.fitness_function.elite.GetSubtree()))
+            # print('g:', self.generations, 'elite fitness:', np.round(self.fitness_function.elite.fitness, 3), ', size:',
+            #       len(self.fitness_function.elite.GetSubtree()))
 
         return self.spreadsheet_string()
 
