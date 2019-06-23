@@ -100,19 +100,19 @@ for ga_pop_size in ga_pop_size_list:
 
                 no_nodes_list.append(len(nodes_final_evolved_function))
 
-                avg_train_mse = np.mean(train_mse_list)
-                std_train_mse = np.std(train_mse_list)
-                avg_train_Rsquared = np.mean(train_Rsquared_list)
-                std_train_Rsquared = np.std(train_Rsquared_list)
+            avg_train_mse = np.mean(train_mse_list)
+            std_train_mse = np.std(train_mse_list)
+            avg_train_Rsquared = np.mean(train_Rsquared_list)
+            std_train_Rsquared = np.std(train_Rsquared_list)
 
-                avg_test_mse = np.mean(test_mse_list)
-                std_test_mse = np.std(test_mse_list)
-                avg_test_Rsquared = np.mean(test_Rsquared_list)
-                std_test_Rsquared = np.std(test_Rsquared_list)
+            avg_test_mse = np.mean(test_mse_list)
+            std_test_mse = np.std(test_mse_list)
+            avg_test_Rsquared = np.mean(test_Rsquared_list)
+            std_test_Rsquared = np.std(test_Rsquared_list)
 
-                avg_no_nodes = np.mean(no_nodes_list)
+            avg_no_nodes = np.mean(no_nodes_list)
 
-                results.append(f'{pop_size}, {crossover_rate}, {mutation_rate}, {max_tree_size}, {tournament_size},'
+            results.append(f'{pop_size}, {crossover_rate}, {mutation_rate}, {max_tree_size}, {tournament_size},'
                            f' {genetic_algorithm}, {ga_pop_size}, #, #'
                            f' {avg_no_nodes}, {avg_train_mse}, {std_train_mse}, {avg_train_Rsquared},'
                            f' {std_train_Rsquared}, {avg_test_mse}, {std_test_mse}, {avg_test_Rsquared},'
@@ -121,6 +121,6 @@ for ga_pop_size in ga_pop_size_list:
 
 df = pd.DataFrame(results, columns=['pop_size, crossover_rate, mutation_rate, max_tree_size, tournament_size,'
                                     'genetic_algorithm, ga_pop_size, de_crossover_rate, de_mutation_rate, no_nodes,'
-									' train_mse_avg, train_mse_std, train_Rsquared_avg, train_Rsquared_std,'
-									' test_mse_avg, test_mse_std, test_Rsquared_avg, test_Rsquared_std'])
+									'train_mse_avg, train_mse_std, train_Rsquared_avg, train_Rsquared_std,'
+									'test_mse_avg, test_mse_std, test_Rsquared_avg, test_Rsquared_std'])
 df.to_csv('results_PSO.csv', index=False)
