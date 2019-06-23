@@ -24,7 +24,7 @@ genetic_algorithm = 'PSO'
 ga_pop_size_list = [10, 50, 100, 250, 500]
 de_mutation_rate_list = [0.25, 0.5, 0.75]
 de_crossover_rate_list = [0.25, 0.5, 0.75]
-weight_tune_percent_list = [0.05, 0.1, 0.25, 0.5, 1]
+weight_tune_percent_list = [0.05, 0.1, 0.25, 0.5, 0.75, 1]
 weight_tune_selection_list = ['best', 'worst', 'random']
 
 
