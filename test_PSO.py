@@ -21,11 +21,12 @@ max_tree_size = 20
 tournament_size = 4
 genetic_algorithm = 'PSO'
 
-ga_pop_size_list = [10, 50, 100, 250, 500]
+ga_pop_size_list = [50, 500]
 de_mutation_rate_list = [0.25, 0.5, 0.75]
 de_crossover_rate_list = [0.25, 0.5, 0.75]
-weight_tune_percent_list = [0.05, 0.1, 0.25, 0.5, 0.75, 1]
-weight_tune_selection_list = ['best', 'worst', 'random']
+weight_tune_percent_list = [0.05, 0.1, 0.25, 0.5, 0.75]
+weight_tune_selection_list = ['best', 'random']
+
 
 
 no_runs = 5
@@ -37,7 +38,7 @@ for ga_pop_size in ga_pop_size_list:
         for weight_tune_selection in weight_tune_selection_list:
 
             # No matter the selection criterion, if we take 100% of trees the result will be the same
-            if weight_tune_selection != 'best' and weight_tune_percent == 1:
+            if (weight_tune_selection != 'best' and ga_pop_size == 500) or (weight_tune_selection != 'random' and ga_pop_size == 50):
                 break
 
             train_mse_list = []
@@ -80,7 +81,7 @@ for ga_pop_size in ga_pop_size_list:
                 sgp = SimpleGP(fitness_function, functions, terminals,
                                pop_size=pop_size, crossover_rate=crossover_rate,
                                mutation_rate=mutation_rate, max_tree_size=max_tree_size,
-                               tournament_size=tournament_size, max_time=60,
+                               tournament_size=tournament_size, max_time=600,
                                ga_population_size=ga_pop_size, genetic_algorithm=genetic_algorithm,
                                weight_tune_percent=weight_tune_percent, weight_tune_selection=weight_tune_selection)  # other parameters are optional
                 sgp.Run()
@@ -113,14 +114,15 @@ for ga_pop_size in ga_pop_size_list:
             avg_no_nodes = np.mean(no_nodes_list)
 
             results.append(f'{pop_size}, {crossover_rate}, {mutation_rate}, {max_tree_size}, {tournament_size},'
-                           f' {genetic_algorithm}, {ga_pop_size}, #, #'
+                           f' {genetic_algorithm}, {ga_pop_size}, {weight_tune_percent}, {weight_tune_selection}'
                            f' {avg_no_nodes}, {avg_train_mse}, {std_train_mse}, {avg_train_Rsquared},'
                            f' {std_train_Rsquared}, {avg_test_mse}, {std_test_mse}, {avg_test_Rsquared},'
                            f' {std_test_Rsquared}')
 
 
 df = pd.DataFrame(results, columns=['pop_size, crossover_rate, mutation_rate, max_tree_size, tournament_size,'
-                                    'genetic_algorithm, ga_pop_size, de_crossover_rate, de_mutation_rate, no_nodes,'
+                                    'genetic_algorithm, ga_pop_size, weight_tune_percent, weight_tune_selection,'
+                                    ' no_nodes,'
 									'train_mse_avg, train_mse_std, train_Rsquared_avg, train_Rsquared_std,'
 									'test_mse_avg, test_mse_std, test_Rsquared_avg, test_Rsquared_std'])
 df.to_csv('results_PSO.csv', index=False)
