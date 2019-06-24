@@ -28,6 +28,7 @@ de_crossover_rate_list = [0.25, 0.5, 0.75]
 weight_tune_percent_list = [0.05, 0.1, 0.25, 0.5, 1]
 weight_tune_selection_list = ['best', 'worst', 'random']
 
+mse_trace_times = [i for i in range(1, 60)]
 
 no_runs = 5
 
@@ -74,7 +75,7 @@ for ga_pop_size in ga_pop_size_list:
                         # Take a dataset split
                         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.5, random_state=seeds[run])
                         # Set fitness function
-                        fitness_function = SymbolicRegressionFitness( X_train, y_train, X_test, y_test )
+                        fitness_function = SymbolicRegressionFitness( X_train, y_train, X_test, y_test, mse_trace_times )
 
                         # Set functions and terminals
                         functions = [ AddNode(), SubNode(), MulNode(), AnalyticQuotientNode() ]	# chosen function nodes
@@ -110,7 +111,7 @@ for ga_pop_size in ga_pop_size_list:
 
                         no_nodes_list.append(len(nodes_final_evolved_function))
 
-                    plot_MSE(train_mse_time_list, test_mse_time_list, [i for i in range(1, 60)])
+                    plot_MSE(train_mse_time_list, test_mse_time_list, mse_trace_times)
 
                     avg_train_mse = np.mean(train_mse_list)
                     std_train_mse = np.std(train_mse_list)

@@ -218,7 +218,7 @@ class SimpleGP:
         plt.hist(weights, range=bounds, bins=range(bounds[0], bounds[1], 2))
         plt.show()
 
-def plot_MSE(train_mse_list, test_mse_list, times_list):
+def plot_MSE(train_mse_list, test_mse_list, mse_times_list):
     # This first part makes sure that all lingering 0's are replaced by the lowest achieved MSE
     train_mse_list = np.array(train_mse_list)
     test_mse_list = np.array(test_mse_list)
@@ -226,7 +226,7 @@ def plot_MSE(train_mse_list, test_mse_list, times_list):
     for j in range(train_mse_list.shape[0]):
         lowest_train_MSE = float('inf')
         lowest_test_MSE = float('inf')
-        for i in range(len(times_list)):
+        for i in range(len(mse_times_list)):
             train_MSE = train_mse_list[j, i]
             if train_MSE < lowest_train_MSE and train_MSE != 0.0:
                 lowest_train_MSE = train_MSE
@@ -242,15 +242,15 @@ def plot_MSE(train_mse_list, test_mse_list, times_list):
     # Plotting of the training and testing MSE
     mean_training = np.mean(train_mse_list, axis=0)
     std_training = np.std(train_mse_list, axis=0)
-    plt.plot(times_list, mean_training,
+    plt.plot(mse_times_list, mean_training,
              label="Training MSE of elite individual")
-    plt.fill_between(times_list, mean_training+std_training, mean_training-std_training, alpha=0.3)
+    plt.fill_between(mse_times_list, mean_training+std_training, mean_training-std_training, alpha=0.2)
 
     mean_testing = np.mean(test_mse_list, axis=0)
     std_testing = np.std(test_mse_list, axis=0)
-    plt.plot(times_list, mean_testing,
+    plt.plot(mse_times_list, mean_testing,
              label="Testing MSE of elite individual")
-    plt.fill_between(times_list, mean_testing+std_testing, mean_testing-std_testing, alpha=0.3)
+    plt.fill_between(mse_times_list, mean_testing+std_testing, mean_testing-std_testing, alpha=0.2)
 
     plt.xlabel('Time (s)')
     plt.ylabel('MSE')

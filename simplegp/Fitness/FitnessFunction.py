@@ -4,7 +4,7 @@ import time
 
 class SymbolicRegressionFitness:
 
-	def __init__( self, X_train, y_train, X_test, y_test ):
+	def __init__( self, X_train, y_train, X_test, y_test, elite_trace_times ):
 		self.X_train = X_train
 		self.y_train = y_train
 		self.X_test = X_test
@@ -12,7 +12,7 @@ class SymbolicRegressionFitness:
 		self.elite = None
 		self.evaluations = 0
 		self.starting_time = time.time()
-		self.elite_trace_times = [i for i in range(1, 60)]
+		self.elite_trace_times = elite_trace_times
 		self.elite_trace_train = np.zeros(len(self.elite_trace_times))
 		self.elite_trace_test = np.zeros(len(self.elite_trace_times))
 		self.elite_counter = 0
