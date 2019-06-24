@@ -68,7 +68,7 @@ for ga_pop_size in ga_pop_size_list:
                 # Take a dataset split
                 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.5, random_state=seeds[run])
                 # Set fitness function
-                fitness_function = SymbolicRegressionFitness( X_train, y_train )
+                fitness_function = SymbolicRegressionFitness( X_train, y_train, X_test, y_test )
 
                 # Set functions and terminals
                 functions = [ AddNode(), SubNode(), MulNode(), AnalyticQuotientNode() ]	# chosen function nodes
