@@ -26,21 +26,22 @@ class SymbolicRegressionFitness:
 		mean_squared_error = np.mean ( np.square( self.y_train - output ) )
 		individual.fitness = mean_squared_error
 
+		if self.elite_counter < len(self.elite_trace_times) and \
+				time.time() - self.starting_time > self.elite_trace_times[self.elite_counter]:
+			self.elite_counter += 1
+			# print('Incremented counter to ' + str(self.elite_counter) + '. Current MSE: ' + str(self.elite.fitness))
+
 		if not self.elite or individual.fitness < self.elite.fitness:
 			del self.elite
 			self.elite = deepcopy(individual)
-			print('new elite with ' + str(mean_squared_error) + ' train MSE')
+			# print('new elite with ' + str(mean_squared_error) + ' train MSE')
 
-			while self.elite_counter < len(self.elite_trace_times) and \
-					time.time() - self.starting_time > self.elite_trace_times[self.elite_counter]:
-				# Set training MSE
-				self.elite_trace_train[self.elite_counter] = mean_squared_error
+			# Set training MSE
+			self.elite_trace_train[self.elite_counter] = mean_squared_error
 
-				# Set testing MSE
-				output = individual.GetOutput(self.X_test)
-				mse = np.mean(np.square(self.y_test - output))
-				self.elite_trace_test[self.elite_counter] = mse
-
-				self.elite_counter += 1
+			# Set testing MSE
+			output = individual.GetOutput(self.X_test)
+			mse = np.mean(np.square(self.y_test - output))
+			self.elite_trace_test[self.elite_counter] = mse
 
 		return mean_squared_error

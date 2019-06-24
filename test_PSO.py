@@ -12,6 +12,7 @@ from simplegp.Nodes.BaseNode import Node
 from simplegp.Nodes.SymbolicRegressionNodes import *
 from simplegp.Fitness.FitnessFunction import SymbolicRegressionFitness
 from simplegp.Evolution.Evolution import SimpleGP
+from simplegp.Evolution.Evolution import plot_MSE
 
 seeds = [42, 166, 214, 5, 82]
 pop_size = 2048
@@ -39,6 +40,9 @@ for ga_pop_size in ga_pop_size_list:
             # No matter the selection criterion, if we take 100% of trees the result will be the same
             if weight_tune_selection != 'best' and weight_tune_percent == 1:
                 break
+
+            train_mse_time_list = []
+            test_mse_time_list = []
 
             train_mse_list = []
             test_mse_list = []
@@ -93,12 +97,17 @@ for ga_pop_size in ga_pop_size_list:
                 test_prediction = final_evolved_function.GetOutput( X_test )
                 test_mse = np.mean(np.square( y_test - test_prediction ))
 
+                train_mse_time_list.append(fitness_function.elite_trace_train)
+                test_mse_time_list.append(fitness_function.elite_trace_test)
+                
                 train_mse_list.append(np.round(final_evolved_function.fitness, 3))
                 train_Rsquared_list.append(np.round(1.0 - final_evolved_function.fitness / np.var(y_train), 3))
                 test_mse_list.append(test_mse)
                 test_Rsquared_list.append(np.round(1.0 - test_mse / np.var(y_test), 3))
 
                 no_nodes_list.append(len(nodes_final_evolved_function))
+
+            plot_MSE(train_mse_time_list, test_mse_time_list, [i for i in range(1, 60)])
 
             avg_train_mse = np.mean(train_mse_list)
             std_train_mse = np.std(train_mse_list)

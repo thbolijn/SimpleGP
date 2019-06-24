@@ -181,37 +181,7 @@ class SimpleGP:
             # print('g:', self.generations, 'elite fitness:', np.round(self.fitness_function.elite.fitness, 3), ', size:',
             #       len(self.fitness_function.elite.GetSubtree()))
 
-        self.plot_MSE()
-
         return self.spreadsheet_string()
-
-    def plot_MSE(self):
-        # This first part makes sure that all lingering 0's are replaced by the lowest achieved MSE
-        lowest_train_MSE = float('inf')
-        lowest_test_MSE = float('inf')
-        for i in range(len(self.fitness_function.elite_trace_times)):
-            train_MSE = self.fitness_function.elite_trace_train[i]
-            if train_MSE < lowest_train_MSE and train_MSE != 0.0:
-                lowest_train_MSE = train_MSE
-            elif train_MSE == 0.0:
-                self.fitness_function.elite_trace_train[i] = lowest_train_MSE
-
-            test_MSE = self.fitness_function.elite_trace_test[i]
-            if test_MSE < lowest_test_MSE and test_MSE != 0.0:
-                lowest_test_MSE = test_MSE
-            elif test_MSE == 0.0:
-                self.fitness_function.elite_trace_test[i] = lowest_test_MSE
-
-        # print(self.fitness_function.elite_trace_train)
-        # print(self.fitness_function.elite_trace_test)
-
-        # Plotting of the training and testing MSE
-        plt.plot(self.fitness_function.elite_trace_times, self.fitness_function.elite_trace_train, label="Training MSE of elite individual")
-        plt.plot(self.fitness_function.elite_trace_times, self.fitness_function.elite_trace_test, label="Testing MSE of elite individual")
-        plt.xlabel('Time (s)')
-        plt.ylabel('MSE')
-        plt.legend(loc='upper right')
-        plt.show()
 
     def show_treesize_histogram(self, population):
         treesizes = []
@@ -247,3 +217,42 @@ class SimpleGP:
     def show_weight_histogram(self, weights, bounds):
         plt.hist(weights, range=bounds, bins=range(bounds[0], bounds[1], 2))
         plt.show()
+
+def plot_MSE(train_mse_list, test_mse_list, times_list):
+    # This first part makes sure that all lingering 0's are replaced by the lowest achieved MSE
+    train_mse_list = np.array(train_mse_list)
+    test_mse_list = np.array(test_mse_list)
+    # Do this for every experiment
+    for j in range(train_mse_list.shape[0]):
+        lowest_train_MSE = float('inf')
+        lowest_test_MSE = float('inf')
+        for i in range(len(times_list)):
+            train_MSE = train_mse_list[j, i]
+            if train_MSE < lowest_train_MSE and train_MSE != 0.0:
+                lowest_train_MSE = train_MSE
+            elif train_MSE == 0.0:
+                train_mse_list[j, i] = lowest_train_MSE
+
+            test_MSE = test_mse_list[j, i]
+            if test_MSE < lowest_test_MSE and test_MSE != 0.0:
+                lowest_test_MSE = test_MSE
+            elif test_MSE == 0.0:
+                test_mse_list[j, i] = lowest_test_MSE
+
+    # Plotting of the training and testing MSE
+    mean_training = np.mean(train_mse_list, axis=0)
+    std_training = np.std(train_mse_list, axis=0)
+    plt.plot(times_list, mean_training,
+             label="Training MSE of elite individual")
+    plt.fill_between(times_list, mean_training+std_training, mean_training-std_training, alpha=0.3)
+
+    mean_testing = np.mean(test_mse_list, axis=0)
+    std_testing = np.std(test_mse_list, axis=0)
+    plt.plot(times_list, mean_testing,
+             label="Testing MSE of elite individual")
+    plt.fill_between(times_list, mean_testing+std_testing, mean_testing-std_testing, alpha=0.3)
+
+    plt.xlabel('Time (s)')
+    plt.ylabel('MSE')
+    plt.legend(loc='upper right')
+    plt.show()
