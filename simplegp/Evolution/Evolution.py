@@ -135,7 +135,8 @@ class SimpleGP:
                     if self.weight_tune_selection == "random":
                         selection = list(range(len(population)))
                         rnd.shuffle(selection)
-                        selected_population = [population[i] for i in selection]
+                        selected_population = [population[i] for i in
+                                               selection[:int(self.weight_tune_percent * len(selection))]]
                     else:
                         fitness_pop = [p.fitness for p in population]
                         arg_fitness = np.argsort(fitness_pop)
