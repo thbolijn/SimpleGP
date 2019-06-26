@@ -11,10 +11,11 @@ from simplegp.Nodes.SymbolicRegressionNodes import *
 from simplegp.Fitness.FitnessFunction import SymbolicRegressionFitness
 from simplegp.Evolution.Evolution import SimpleGP
 import random
+from tqdm import tqdm
 
-seed_no = 42
-np.random.seed(seed_no)
-random.seed(seed_no)
+# seed_no = 42
+# np.random.seed(seed_no)
+# random.seed(seed_no)
 
 # Choose the dataset from here
 yacht = 'datasets/yacht_full.dat'
@@ -46,20 +47,25 @@ test_mse_list = []
 train_R_list = []
 test_R_list = []
 
-no_repetitions = 1
+no_repetitions = 5
 
-pop_size = 32
-crossover_rate = 0.5
-mutation_rate = 0.5
-max_tree_size = 500
+pop_size = 2048
+crossover_rate = 0.75
+mutation_rate = 1
+max_tree_size = 20
 tournament_size = 4
-ga_pop_size = 100
-genetic_algorithm = 'DE'
+ga_pop_size = 50
+genetic_algorithm = 'PSO'
 
-for whatever in range(no_repetitions):
+seeds = [42, 166, 214, 5, 82]
+
+for index in tqdm(range(no_repetitions)):
+
+    np.random.seed(seeds[index])
+    random.seed(seeds[index])
 
     # Take a dataset split
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=seed_no)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=seeds[index])
     # Set fitness function
     fitness_function = SymbolicRegressionFitness(X_train, y_train)
 
@@ -117,6 +123,6 @@ print(f'Train mean MSE: {avg_train_mse}\t Train std MSE: {std_train_mse}'
       f'\nTest mean MSE: {avg_test_mse}\t Test std MSE: {std_test_mse}'
       f'\nTest mean R squared: {avg_test_R}\t Test std R squared: {std_test_R}')
 
-result = ','.join(map(str, [dataset, seed_no, test_size, np.round(avg_train_mse, 3), np.round(avg_train_R, 3),
+result = ','.join(map(str, [dataset, test_size, np.round(avg_train_mse, 3), np.round(avg_train_R, 3),
 							np.round(avg_test_mse, 3), np.round(avg_test_R, 3), no_repetitions, spreadsheet_string]))
 print(result)

@@ -23,15 +23,15 @@ class SimpleGP:
             crossover_rate=0.5,
             mutation_rate=0.5,
             max_evaluations=-1,
-            max_generations=10,
-            max_time=60,
+            max_generations=-1,
+            max_time=600,
             initialization_max_tree_height=4,
             max_tree_size=20,
             tournament_size=2,
             genetic_algorithm="PSO",
             every_n_generation=1,
-            weight_tune_percent=0.5,  # Put to 1 if all trees should be weight-tuned
-            weight_tune_selection="best",  # Choose from "best", "worst", "random"
+            weight_tune_percent=0.05,  # Put to 1 if all trees should be weight-tuned
+            weight_tune_selection="random",  # Choose from "best", "worst", "random"
             ga_population_size=40,
             ga_iterations=100,
             de_mutation_rate=0.3,
@@ -72,10 +72,10 @@ class SimpleGP:
         elif self.max_time > 0 and elapsed_time >= self.max_time:
             must_terminate = True
 
-        if must_terminate:
-            print('Terminating at\n\t',
-                  self.generations, 'generations\n\t', self.fitness_function.evaluations, 'evaluations\n\t',
-                  np.round(elapsed_time, 2), 'seconds')
+        # if must_terminate:
+        #     print('Terminating at\n\t',
+        #           self.generations, 'generations\n\t', self.fitness_function.evaluations, 'evaluations\n\t',
+        #           np.round(elapsed_time, 2), 'seconds')
 
         return must_terminate
 
@@ -127,7 +127,7 @@ class SimpleGP:
                 prev_fitness = np.round(self.fitness_function.elite.fitness, 3)
                 count_repeat = 0
 
-            if count_repeat >= -1:
+            if count_repeat >= 2:
                 repeat = True
 
             # if self.generations % self.every_n_generation == 0 and self.generations != 0:
@@ -138,7 +138,8 @@ class SimpleGP:
                     if self.weight_tune_selection == "random":
                         selection = list(range(len(population)))
                         rnd.shuffle(selection)
-                        selected_population = [population[i] for i in selection]
+                        selected_population = [population[i] for i in
+                                               selection[:int(self.weight_tune_percent * len(selection))]]
                     else:
                         fitness_pop = [p.fitness for p in population]
                         arg_fitness = np.argsort(fitness_pop)
@@ -190,14 +191,14 @@ class SimpleGP:
                 sum_sizes += len(p.GetSubtree())
             avg_tree_size.append(sum_sizes / len(population))
 
-            print('g:', self.generations, 'elite fitness:', np.round(self.fitness_function.elite.fitness, 3), ', size:',
-                  len(self.fitness_function.elite.GetSubtree()))
+            # print('g:', self.generations, 'elite fitness:', np.round(self.fitness_function.elite.fitness, 3), ', size:',
+            #       len(self.fitness_function.elite.GetSubtree()))
 
         # Plot the average tree size over generations
-        plt.plot(avg_tree_size)
-        plt.xlabel('Generation')
-        plt.ylabel('Average tree size')
-        plt.show()
+        # plt.plot(avg_tree_size)
+        # plt.xlabel('Generation')
+        # plt.ylabel('Average tree size')
+        # plt.show()
 
         return self.spreadsheet_string()
 
