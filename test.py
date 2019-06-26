@@ -6,6 +6,7 @@ from copy import deepcopy
 import pandas as pd
 import time
 import os
+from Plot import experiment, plot_experiment
 
 # Internal imports
 from simplegp.Nodes.BaseNode import Node
@@ -63,8 +64,10 @@ genetic_algorithm = 'PSO'
 
 seeds = [42, 166, 214, 5, 82]
 
-# trace_timing = [1, 10, 20, 30, 40, 50, 60, 120, 180, 240, 300]
-trace_timing = range(1, 60, 5)
+# trace_timing = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 14, 16, 18, 20, 25, 30, 35,
+#                 40, 45, 50, 55, 60, 70, 80, 90, 100, 110, 120, 150, 180, 210,
+#                 240, 270, 300]
+trace_timing = range(1, 301)
 
 for index in tqdm(range(no_repetitions)):
 
@@ -128,6 +131,7 @@ std_train_R = np.std(train_R_list)
 avg_test_R = np.mean(test_R_list)
 std_test_R = np.std(test_R_list)
 
+# Saving MSE for plotting
 train_trace_mean = np.mean(train_trace_list, axis=0)
 test_trace_mean = np.mean(test_trace_list, axis=0)
 train_trace_std = np.std(train_trace_list, axis=0)
@@ -135,9 +139,13 @@ test_trace_std = np.std(test_trace_list, axis=0)
 if not os.path.exists('results'):
     os.mkdir('results')
 time_string = time.strftime('%Y%m%d_%H%M%S_', time.localtime())
+filename = 'results/' + time_string + 'traces'
 traces = np.vstack([trace_timing, train_trace_mean, train_trace_std, test_trace_mean, test_trace_std])
-print(traces)
-np.save('results/' + time_string + 'traces', traces)
+np.save(filename, traces)
+
+# Plotting training and testing MSE
+e = experiment(filename + '.npy')
+plot_experiment([e])
 
 print(f'Train mean MSE: {avg_train_mse}\t Train std MSE: {std_train_mse}'
       f'\nTrain mean R squared: {avg_train_R}\t Train std R squared: {std_train_R}'
