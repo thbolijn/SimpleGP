@@ -24,13 +24,13 @@ class SimpleGP:
             mutation_rate=0.5,
             max_evaluations=-1,
             max_generations=-1,
-            max_time=600,
+            max_time=60,
             initialization_max_tree_height=4,
             max_tree_size=20,
             tournament_size=2,
             genetic_algorithm="PSO",
             every_n_generation=1,
-            weight_tune_percent=0.05,  # Put to 1 if all trees should be weight-tuned
+            weight_tune_percent=0.5,  # Put to 1 if all trees should be weight-tuned
             weight_tune_selection="random",  # Choose from "best", "worst", "random"
             ga_population_size=40,
             ga_iterations=100,
@@ -200,7 +200,7 @@ class SimpleGP:
         # plt.ylabel('Average tree size')
         # plt.show()
 
-        return self.spreadsheet_string()
+        return self.spreadsheet_string(), population
 
     def show_treesize_histogram(self, population):
         treesizes = []

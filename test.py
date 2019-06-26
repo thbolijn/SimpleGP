@@ -67,7 +67,7 @@ seeds = [42, 166, 214, 5, 82]
 # trace_timing = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 14, 16, 18, 20, 25, 30, 35,
 #                 40, 45, 50, 55, 60, 70, 80, 90, 100, 110, 120, 150, 180, 210,
 #                 240, 270, 300]
-trace_timing = range(1, 301)
+trace_timing = range(1, 61)
 
 for index in tqdm(range(no_repetitions)):
 
@@ -76,6 +76,7 @@ for index in tqdm(range(no_repetitions)):
 
     # Take a dataset split
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=seeds[index])
+    X_train, X_validation, y_train, y_validation = train_test_split(X_train, y_train, test_size=0.2, random_state=seeds[index])
     # Set fitness function
     fitness_function = SymbolicRegressionFitness(X_train, y_train, X_test, y_test, trace_timing)
 
@@ -91,7 +92,7 @@ for index in tqdm(range(no_repetitions)):
                    mutation_rate=mutation_rate, max_tree_size=max_tree_size,
                    tournament_size=tournament_size,
                    ga_population_size=ga_pop_size, genetic_algorithm=genetic_algorithm)
-    spreadsheet_string = sgp.Run()
+    spreadsheet_string, final_population = sgp.Run()
 
     # Print results
     # Show the evolved function
@@ -103,12 +104,35 @@ for index in tqdm(range(no_repetitions)):
     training_Rsquared = np.round(1.0 - final_evolved_function.fitness / np.var(y_train), 3)
     print('Training\n\tMSE:', training_MSE,
         '\n\tRsquared:', training_Rsquared)
+    print('Validation\n\tMSE:', np.round(fitness_function.Evaluate_diff_data(final_evolved_function, X_validation, y_validation),3))
     # Re-evaluate the evolved function on the test set
     test_prediction = final_evolved_function.GetOutput(X_test)
     test_mse = np.round(np.mean(np.square(y_test - test_prediction)), 3)
     test_Rsquared = np.round(1.0 - test_mse / np.var(y_test), 3)
     print('Test:\n\tMSE:', test_mse,
         '\n\tRsquared:', test_Rsquared)
+
+    # VALIDATION PHASE
+    validation_mse = []
+    for p in final_population:
+        validation_mse.append(fitness_function.Evaluate_diff_data(p, X_validation, y_validation))
+    final_evolved_function = final_population[np.argmin(validation_mse)]
+    print('AFTER VALIDATING: ')
+    nodes_final_evolved_function = final_evolved_function.GetSubtree()
+    print('Function found (', len(nodes_final_evolved_function), 'nodes ):\n\t',
+          nodes_final_evolved_function)  # this is in Polish notation
+    # Print results for training set
+    training_MSE = np.round(final_evolved_function.fitness, 3)
+    training_Rsquared = np.round(1.0 - final_evolved_function.fitness / np.var(y_train), 3)
+    print('Training\n\tMSE:', training_MSE,
+          '\n\tRsquared:', training_Rsquared)
+    print('Validation\n\tMSE:', np.round(fitness_function.Evaluate_diff_data(final_evolved_function, X_validation, y_validation),3))
+    # Re-evaluate the evolved function on the test set
+    test_prediction = final_evolved_function.GetOutput(X_test)
+    test_mse = np.round(np.mean(np.square(y_test - test_prediction)), 3)
+    test_Rsquared = np.round(1.0 - test_mse / np.var(y_test), 3)
+    print('Test:\n\tMSE:', test_mse,
+          '\n\tRsquared:', test_Rsquared)
 
     train_mse_list.append(training_MSE)
     test_mse_list.append(test_mse)

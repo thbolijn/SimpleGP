@@ -46,6 +46,11 @@ class SymbolicRegressionFitness:
 
 		return mean_squared_error
 
+	def Evaluate_diff_data(self, individual, X, y):
+		output = individual.GetOutput(X)
+		mean_squared_error = np.mean(np.square(y - output))
+		return mean_squared_error
+
 	def get_processed_traces(self):
 		train_mse_list = np.array(self.elite_trace_train)
 		test_mse_list = np.array(self.elite_trace_test)
