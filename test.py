@@ -41,14 +41,20 @@ y = df.iloc[:, -1]
 X = X.values
 y = y.values
 
-
-
 train_mse_list = []
 test_mse_list = []
 train_R_list = []
 test_R_list = []
 
-no_repetitions = 2
+no_repetitions = 1
+
+pop_size = 32
+crossover_rate = 0.5
+mutation_rate = 0.5
+max_tree_size = 500
+tournament_size = 4
+ga_pop_size = 100
+genetic_algorithm = 'DE'
 
 for whatever in range(no_repetitions):
 
@@ -64,7 +70,11 @@ for whatever in range(no_repetitions):
         terminals.append(FeatureNode(i))  # add a feature node for each feature
 
     # Run GP
-    sgp = SimpleGP(fitness_function, functions, terminals)  # other parameters are optional
+    sgp = SimpleGP(fitness_function, functions, terminals,
+                   pop_size=pop_size, crossover_rate=crossover_rate,
+                   mutation_rate=mutation_rate, max_tree_size=max_tree_size,
+                   tournament_size=tournament_size,
+                   ga_population_size=ga_pop_size, genetic_algorithm=genetic_algorithm)
     spreadsheet_string = sgp.Run()
 
     # Print results

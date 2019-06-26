@@ -87,7 +87,15 @@ class PSO():
     def __init__(self, costFunc, x0, bounds, tree_root, num_particles, maxiter, start_time, max_time):
 
         self.start_time = start_time
-        self.max_time = max_time
+
+        if max_time < 0:
+            self.max_time = 10**10
+        else:
+            self.max_time = max_time
+        self.prev_computed_best = 0
+        self.stop = False
+        self.count_repetitions = 0
+
 
         nodes = tree_root.GetSubtree()
         W = []  # weight vector
@@ -112,8 +120,10 @@ class PSO():
 
         # begin optimization loop
         i = 0
-        elapsed_time = 0
-        while i < maxiter and elapsed_time < max_time:
+        elapsed_time = time.time() - self.start_time
+
+        # while i < maxiter and elapsed_time < max_time:
+        while i < maxiter and elapsed_time < self.max_time and not self.stop:
             # print i,err_best_g
             # cycle through particles in swarm and evaluate fitness
             for j in range(0, num_particles):
@@ -123,6 +133,16 @@ class PSO():
                 if swarm[j].err_i < self.err_best_g or self.err_best_g == -1:
                     self.pos_best_g = list(swarm[j].position_i)
                     self.err_best_g = float(swarm[j].err_i)
+
+            # If the same best is found for 5 consecutive iterations then we stop
+            if self.count_repetitions >= 5:
+                self.stop = True
+
+            if self.prev_computed_best == np.round(self.err_best_g, 3):
+                self.count_repetitions += 1
+            else:
+                self.prev_computed_best = np.round(self.err_best_g, 3)
+                self.count_repetitions = 0
 
             # cycle through swarm and update velocities and position
             for j in range(0, num_particles):

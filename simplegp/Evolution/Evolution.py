@@ -23,15 +23,15 @@ class SimpleGP:
             crossover_rate=0.5,
             mutation_rate=0.5,
             max_evaluations=-1,
-            max_generations=-1,
+            max_generations=10,
             max_time=60,
             initialization_max_tree_height=4,
             max_tree_size=20,
             tournament_size=2,
             genetic_algorithm="PSO",
             every_n_generation=1,
-            weight_tune_percent=0.05,  # Put to 1 if all trees should be weight-tuned
-            weight_tune_selection="worst",  # Choose from "best", "worst", "random"
+            weight_tune_percent=0.5,  # Put to 1 if all trees should be weight-tuned
+            weight_tune_selection="best",  # Choose from "best", "worst", "random"
             ga_population_size=40,
             ga_iterations=100,
             de_mutation_rate=0.3,
@@ -82,6 +82,9 @@ class SimpleGP:
     def Run(self):
         self.start_time = time.time()
 
+        # List of storing the average tree size of each generation
+        avg_tree_size = []
+
         population = []
         for i in range(self.pop_size):
             population.append(
@@ -124,7 +127,7 @@ class SimpleGP:
                 prev_fitness = np.round(self.fitness_function.elite.fitness, 3)
                 count_repeat = 0
 
-            if count_repeat >= 2:
+            if count_repeat >= -1:
                 repeat = True
 
             # if self.generations % self.every_n_generation == 0 and self.generations != 0:
@@ -152,34 +155,49 @@ class SimpleGP:
 
                 # Tune the weights for every tree in the selected population
                 print(self.genetic_algorithm, 'tuning on', self.weight_tune_selection, len(selected_population), 'of', len(population), 'trees:')
-                for p in tqdm(selected_population):
-                    if len(p.GetSubtree()) > 1:
-                        nodes = p.GetSubtree()
-                        W = []  # weight vector
-                        for n in nodes:
-                            W.append(n.weights)
-                        # bounds needed for both algorithms
-                        bounds = [(-25, 25)] * len(W) * 2
-                        if self.genetic_algorithm == "PSO":
-                            pso = PSO(self.fitness_function.Evaluate, W, bounds, p, self.ga_population_size,
-                                      self.ga_iterations, self.start_time, self.max_time)
-                            W = pso.solution()
+                for p in selected_population:
+                    # if len(p.GetSubtree()) > 1:
+                    nodes = p.GetSubtree()
+                    W = []  # weight vector
+                    for n in nodes:
+                        W.append(n.weights)
+                    # bounds needed for both algorithms
+                    bounds = [(-25, 25)] * len(W) * 2
+                    if self.genetic_algorithm == "PSO":
+                        pso = PSO(self.fitness_function.Evaluate, W, bounds, p, self.ga_population_size,
+                                  self.ga_iterations, self.start_time, self.max_time)
+                        W = pso.solution()
 
-                        elif self.genetic_algorithm == "DE":
-                            W = DifferentialEvolution.main(self.fitness_function.Evaluate, p, bounds, self.ga_population_size, self.de_mutation_rate,
-                                                           self.de_recombination_rate, self.ga_iterations, self.start_time, self.max_time)
+                    elif self.genetic_algorithm == "DE":
+                        W = DifferentialEvolution.main(self.fitness_function.Evaluate, p, bounds, self.ga_population_size, self.de_mutation_rate,
+                                                       self.de_recombination_rate, self.ga_iterations, self.start_time, self.max_time)
 
-                        nodes = p.GetSubtree()
-                        for n in nodes:
-                            n.weights = [W.pop(), W.pop()]
+                    nodes = p.GetSubtree()
+                    for n in nodes:
+                        n.weights = [W.pop(), W.pop()]
+
+                    # Break the tuning if the time is up
+                    if self.__ShouldTerminate():
+                        break
 
                 repeat = False
                 count_repeat = 0
 
             self.generations = self.generations + 1
 
+            sum_sizes = 0
+            for p in population:
+                sum_sizes += len(p.GetSubtree())
+            avg_tree_size.append(sum_sizes / len(population))
+
             print('g:', self.generations, 'elite fitness:', np.round(self.fitness_function.elite.fitness, 3), ', size:',
                   len(self.fitness_function.elite.GetSubtree()))
+
+        # Plot the average tree size over generations
+        plt.plot(avg_tree_size)
+        plt.xlabel('Generation')
+        plt.ylabel('Average tree size')
+        plt.show()
 
         return self.spreadsheet_string()
 

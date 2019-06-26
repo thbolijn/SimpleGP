@@ -3,6 +3,7 @@
 import random
 from copy import deepcopy
 import time
+import numpy as np
 
 # --- EXAMPLE COST FUNCTIONS ---------------------------------------------------+
 
@@ -55,6 +56,13 @@ def main(cost_func, p, bounds, popsize, mutate, recombination, maxiter, start_ti
        for j in range(len(bounds)):
            indv.append(random.uniform(bounds[j][0], bounds[j][1]))
        population.append(indv)
+
+    if max_time < 0:
+        max_time = 10 ** 10
+
+    prev_computed_best = 0
+    stop = False
+    count_repetitions = 0
 
     # --- SOLVE --------------------------------------------+
 
@@ -111,7 +119,7 @@ def main(cost_func, p, bounds, popsize, mutate, recombination, maxiter, start_ti
                 n.weights = [positions.pop(), positions.pop()]
             score_trial = cost_func(p)
 
-            positions = deepcopy(x_t) # TODO: Is double deepcopy needed or can positions just be updated? Does it matter?
+            positions = deepcopy(x_t)
             # positions = x_t
             for n in nodes:
                 n.weights = [positions.pop(), positions.pop()]
@@ -138,6 +146,15 @@ def main(cost_func, p, bounds, popsize, mutate, recombination, maxiter, start_ti
         #gen_avg = sum(gen_scores) / popsize  # current generation avg. fitness
         gen_best = min(gen_scores)  # fitness of best individual
         gen_sol = population[gen_scores.index(min(gen_scores))]  # solution of best individual
+
+        if count_repetitions >= 5:
+            break
+
+        if prev_computed_best == np.round(gen_best, 3):
+            count_repetitions += 1
+        else:
+            prev_computed_best = np.round(gen_best, 3)
+            count_repetitions = 0
 
         if elapsed_time > max_time:
             break
