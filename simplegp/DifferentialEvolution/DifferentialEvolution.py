@@ -148,8 +148,8 @@ def main(cost_func, p, bounds, popsize, mutate, recombination, maxiter, start_ti
         gen_sol = population[gen_scores.index(min(gen_scores))]  # solution of best individual
 
         # Enable the early stopping thing
-        # if count_repetitions >= 5:
-        #     break
+        if count_repetitions >= 5:
+            break
 
         if prev_computed_best == np.round(gen_best, 3):
             count_repetitions += 1
