@@ -52,8 +52,6 @@ test_R_list = []
 train_trace_list = []
 test_trace_list = []
 
-no_repetitions = 5
-
 pop_size = 2048
 crossover_rate = 0.75
 mutation_rate = 1
@@ -61,7 +59,7 @@ max_tree_size = 20
 tournament_size = 4
 ga_pop_size = 50
 genetic_algorithm_list = ['PSO', 'DE', None]
-de_recombination_rate = 0.25
+de_recombination_rate = 0.5
 de_mutation_rate = 0.75
 max_time = 600
 
@@ -73,8 +71,8 @@ trace_timing = range(1, 601)
 weight_tune_percent = 0
 weight_tune_selection = ''
 
-for genetic_algorithm in genetic_algorithm_list:
-    for index in tqdm(range(len(seeds))):
+for genetic_algorithm in tqdm(genetic_algorithm_list):
+    for index in range(len(seeds)):
 
         np.random.seed(seeds[index])
         random.seed(seeds[index])
@@ -171,5 +169,5 @@ for genetic_algorithm in genetic_algorithm_list:
           f'\nTest mean R squared: {avg_test_R}\t Test std R squared: {std_test_R}')
 
     result = ','.join(map(str, [dataset, test_size, np.round(avg_train_mse, 3), np.round(avg_train_R, 3),
-                                np.round(avg_test_mse, 3), np.round(avg_test_R, 3), no_repetitions, spreadsheet_string]))
+                                np.round(avg_test_mse, 3), np.round(avg_test_R, 3), spreadsheet_string]))
     print(result)
