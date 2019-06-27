@@ -122,8 +122,8 @@ class PSO():
         i = 0
         elapsed_time = time.time() - self.start_time
 
-        # while i < maxiter and elapsed_time < max_time:
-        while i < maxiter and elapsed_time < self.max_time and not self.stop:
+        while i < maxiter and elapsed_time < max_time:
+        # while i < maxiter and elapsed_time < self.max_time and not self.stop:
             # print i,err_best_g
             # cycle through particles in swarm and evaluate fitness
             for j in range(0, num_particles):

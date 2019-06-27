@@ -30,12 +30,12 @@ class SimpleGP:
             tournament_size=2,
             genetic_algorithm="PSO",
             every_n_generation=1,
-            weight_tune_percent=0.05,  # Put to 1 if all trees should be weight-tuned
-            weight_tune_selection="random",  # Choose from "best", "worst", "random"
-            ga_population_size=40,
+            weight_tune_percent=0.5,  # Put to 1 if all trees should be weight-tuned
+            weight_tune_selection="worst",  # Choose from "best", "worst", "random"
+            ga_population_size=50,
             ga_iterations=100,
-            de_mutation_rate=0.3,
-            de_recombination_rate=0.3
+            de_mutation_rate=0.5,
+            de_recombination_rate=0.75
     ):
 
         self.pop_size = pop_size
