@@ -52,7 +52,6 @@ test_R_list = []
 train_trace_list = []
 test_trace_list = []
 
-no_repetitions = 5
 
 pop_size = 2048
 crossover_rate = 0.75
@@ -171,5 +170,5 @@ for genetic_algorithm in tqdm(genetic_algorithm_list):
           f'\nTest mean R squared: {avg_test_R}\t Test std R squared: {std_test_R}')
 
     result = ','.join(map(str, [dataset, test_size, np.round(avg_train_mse, 3), np.round(avg_train_R, 3),
-                                np.round(avg_test_mse, 3), np.round(avg_test_R, 3), no_repetitions, spreadsheet_string]))
+                                np.round(avg_test_mse, 3), np.round(avg_test_R, 3), spreadsheet_string]))
     print(result)
